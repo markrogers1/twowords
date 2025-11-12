@@ -84,7 +84,7 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
     
-    /* LOGO BUTTON — CLEAN, ANIMATED, TAP TO SHARE */
+    /* LOGO BUTTON — DOUBLE BUMP EVERY 4s */
     .logo-btn {
       background: transparent;
       border: none;
@@ -107,14 +107,17 @@
       transform: scale(0.97);
     }
     
-    /* POP ANIMATION EVERY 4 SECONDS */
-    @keyframes pop {
+    /* DOUBLE BUMP ANIMATION */
+    @keyframes doubleBump {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+      20% { transform: scale(1.06); }
+      40% { transform: scale(1.02); }
+      60% { transform: scale(1.08); }
+      80%, 100% { transform: scale(1); }
     }
-    
-    .logo-btn.popping {
-      animation: pop 0.6s ease-in-out;
+
+    .logo-btn.bumping {
+      animation: doubleBump 0.8s ease-in-out;
     }
     
     .logo-text {
@@ -366,7 +369,7 @@
     <button class="login-btn">Login</button>
   </div>
 
-  <!-- LOGO BUTTON — POPS EVERY 4 SECONDS -->
+  <!-- LOGO BUTTON — DOUBLE BUMP EVERY 4s -->
   <button class="logo-btn" id="logoBtn">
     <span class="logo-text">TWO</span>
     <span class="logo-bar">|</span>
@@ -473,18 +476,17 @@
 
     setTimeout(spinAndStop, 1000);
 
-    // LOGO POP ANIMATION EVERY 4 SECONDS
-    function popLogo() {
-      logoBtn.classList.add('popping');
+    // DOUBLE BUMP LOGO EVERY 4 SECONDS
+    function doubleBumpLogo() {
+      logoBtn.classList.add('bumping');
       setTimeout(() => {
-        logoBtn.classList.remove('popping');
-      }, 600);
+        logoBtn.classList.remove('bumping');
+      }, 800);
     }
 
-    // Start popping after 2s, then every 4s
     setTimeout(() => {
-      popLogo();
-      setInterval(popLogo, 4000);
+      doubleBumpLogo();
+      setInterval(doubleBumpLogo, 4000);
     }, 2000);
 
     // MODALS
