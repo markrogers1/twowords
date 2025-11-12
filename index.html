@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#E91E63"/>
+  <title>TWO | WORDS – Double opt-in networking. Zero creeps.</title>
+  <meta name="description" content="Get a random funny two-word code. Share by voice, bump, or QR. Only people you give your words to can find you."/>
+  
+  <!-- PWA manifest -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    %22name%22:%22TWO | WORDS%22,
+    %22short_name%22:%22TWOWORDS%22,
+    %22start_url%22:%22.%22,
+    %22display%22:%22standalone%22,
+    %22background_color%22:%22#E91E63%22,
+    %22theme_color%22:%22#E91E63%22,
+    %22icons%22:[{%22src%22:%22https://via.placeholder.com/192?text=%F0%9F%92%95%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]
+  }"/>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Space+Grotesk:wght@700&display=swap');
+    
+    :root {
+      --pink: #E91E63;
+      --dark: #1A1A1A;
+      --white: #FFFFFF;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--pink);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h1 {
+      font-size: 4.5rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .tagline {
+      font-size: 1.4rem;
+      opacity: 0.9;
+      margin-bottom: 3rem;
+    }
+    .search-bar {
+      background: white;
+      border-radius: 999px;
+      padding: 1rem 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      max-width: 90%;
+    }
+    .bubble {
+      font-size: 1.4rem;
+      padding: 0.8rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--dark);
+      width: 140px;
+      text-align: center;
+    }
+    .bubble::placeholder { color: #999; }
+    .separator {
+      font-size: 4rem;
+      font-weight: 900;
+      color: var(--dark);
+    }
+    .mic-btn {
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(10px);
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      padding: 1.2rem 2rem;
+      border-radius: 999px;
+      margin-top: 2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .examples {
+      margin-top: 4rem;
+      font-size: 1.3rem;
+      opacity: 0.9;
+    }
+    .premium {
+      margin-top: 4rem;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    footer {
+      margin-top: 5rem;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 3.2rem; }
+      .search-bar { flex-direction: column; padding: 1.5rem; }
+      .separator { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>TWO <span style="color:#1A1A1A;">|</span> WORDS</h1>
+  <p class="tagline">Double opt-in networking. Zero creeps.</p>
+
+  <div class="search-bar">
+    <input type="text" class="bubble" placeholder="ninja" disabled />
+    <div class="separator">|</div>
+    <input type="text" class="bubble" placeholder="waffle" disabled />
+  </div>
+
+  <button class="mic-btn">
+    Tap & speak the two words
+  </button>
+
+  <div class="examples">
+    Try: <strong>ninja | waffle</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>
+  </div>
+
+  <div class="premium">
+    <strong>Premium $4.99/mo</strong><br>
+    Custom colours • Verified checkmark • Unlimited chats • Bump phones • Animated QR
+  </div>
+
+  <footer>
+    Share by voice, bump, or QR • No one finds you unless you give your words<br>
+    Coming soon to iPhone & Android • <a href="https://github.com/YOUR-USERNAME/two-words" style="color:white;">GitHub</a>
+  </footer>
+
+  <!-- QR placeholder (replace with real one later) -->
+  <div style="margin-top:3rem;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://two-words.app/ninja-waffle&bgcolor=E91E63&color=FFFFFF" alt="QR code"/>
+    <p style="font-size:0.9rem; margin-top:0.5rem;">Hold camera over QR → opens instantly</p>
+  </div>
+
+  <script>
+    // Fake mic click → fun message
+    document.querySelector('.mic-btn').addEventListener('click', () => {
+      alert('Say “ninja waffle” out loud…\n\nProfile appears in 1.2 seconds. Magic. 🎤');
+    });
+  </script>
+</body>
+</html>
