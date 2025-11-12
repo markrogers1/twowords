@@ -32,7 +32,6 @@
       position: relative;
     }
     
-    /* BUMP BUTTON — top-right */
     .bump-btn {
       position: absolute;
       top: 2rem;
@@ -115,12 +114,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-    
-    .bubble::placeholder { 
-      color: #999; 
-      font-style: italic;
-      font-weight: normal;
+      overflow: hidden;
     }
     
     .search-bar .separator {
@@ -169,6 +163,7 @@
       margin-bottom: 3rem;
       line-height: 1.6;
       color: white;
+      opacity: 0.9;
     }
     
     .examples strong {
@@ -176,7 +171,6 @@
       color: white;
     }
     
-    /* SHARE MODAL */
     .modal {
       display: none;
       position: fixed;
@@ -275,7 +269,6 @@
 </head>
 <body>
 
-  <!-- BUMP BUTTON -->
   <button class="bump-btn">Bump</button>
 
   <div class="logo">
@@ -287,9 +280,9 @@
   <p class="subtitle">Safe sharing. Instant networking.</p>
 
   <div class="search-bar">
-    <input type="text" class="bubble" placeholder="ninja" disabled />
+    <div class="bubble" id="word1">ninja</div>
     <div class="separator">|</div>
-    <input type="text" class="bubble" placeholder="waffle" disabled />
+    <div class="bubble" id="word2">waffle</div>
   </div>
 
   <button class="mic-btn" aria-label="Speak two words">
@@ -298,7 +291,7 @@
     </svg>
   </button>
 
-  <div class="examples">
+  <div class="examples" id="examples">
     Try: <strong>ninja | waffle</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>
   </div>
 
@@ -319,6 +312,55 @@
   </div>
 
   <script>
+    // 20 FUNNY WORDS
+    const words = [
+      "ninja", "waffle", "disco", "penguin", "grumpy", "avocado",
+      "laser", "pickle", "cosmic", "donut", "sneaky", "taco",
+      "fuzzy", "rocket", "bouncy", "sloth", "glitter", "burrito",
+      "zippy", "muffin"
+    ];
+
+    const word1El = document.getElementById('word1');
+    const word2El = document.getElementById('word2');
+    const examplesEl = document.getElementById('examples');
+
+    let isSpinning = false;
+
+    function getRandomWord() {
+      return words[Math.floor(Math.random() * words.length)];
+    }
+
+    function spinAndStop() {
+      if (isSpinning) return;
+      isSpinning = true;
+
+      let spins = 0;
+      const maxSpins = 12 + Math.floor(Math.random() * 8); // 12–20 spins
+      const finalWord1 = getRandomWord();
+      const finalWord2 = getRandomWord();
+
+      const interval = setInterval(() => {
+        word1El.textContent = getRandomWord();
+        word2El.textContent = getRandomWord();
+        spins++;
+
+        if (spins >= maxSpins) {
+          clearInterval(interval);
+          word1El.textContent = finalWord1;
+          word2El.textContent = finalWord2;
+          examplesEl.innerHTML = `Try: <strong>${finalWord1} | ${finalWord2}</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>`;
+          isSpinning = false;
+
+          // Next spin in 3–5 seconds
+          setTimeout(spinAndStop, 3000 + Math.random() * 2000);
+        }
+      }, 80);
+    }
+
+    // Start first spin after 1s
+    setTimeout(spinAndStop, 1000);
+
+    // Bump Modal
     const bumpBtn = document.querySelector('.bump-btn');
     const modal = document.getElementById('shareModal');
     const closeModal = document.querySelector('.close-modal');
@@ -337,8 +379,11 @@
       }
     });
 
+    // Mic demo
     document.querySelector('.mic-btn').addEventListener('click', () => {
-      alert('Say “ninja waffle” out loud…\n\nProfile appears in 1.2 seconds. Magic.');
+      const w1 = word1El.textContent;
+      const w2 = word2El.textContent;
+      alert(`Say “${w1} ${w2}” out loud…\n\nProfile appears in 1.2 seconds. Magic.`);
     });
   </script>
 
