@@ -7,11 +7,12 @@
   <title>TWO | WORDS</title>
   
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900;600&display=swap');
     
     :root {
       --pink: #E91E63;
-      --dark: #1A1A1A;
+      --black: #1A1A1A;
+      --gray: #555555;
       --white: #FFFFFF;
     }
     
@@ -28,43 +29,89 @@
       align-items: center;
       padding: 2rem;
       text-align: center;
+      position: relative;
     }
     
-    h1 {
+    /* BUMP BUTTON — top-right */
+    .bump-btn {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: white;
+      color: var(--pink);
+      font-weight: 700;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    
+    .bump-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.1rem;
+      margin-bottom: 0.3rem;
+    }
+    
+    .logo-text {
       font-size: clamp(3rem, 12vw, 6rem);
       font-weight: 900;
       letter-spacing: -0.05em;
-      margin-bottom: 1.5rem;
+      color: white;
     }
     
-    .separator {
-      font-size: clamp(3rem, 10vw, 5rem);
+    .logo-bar {
+      font-size: clamp(3.8rem, 13.5vw, 6.8rem);
       font-weight: 900;
-      color: var(--dark);
+      color: var(--black);
+      line-height: 0.9;
+      margin-top: -0.05em;
+    }
+    
+    .subtitle {
+      font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+      font-weight: 600;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
     }
     
     .search-bar {
       background: white;
-      border-radius: 999px;
-      padding: clamp(0.8rem, 2vw, 1.2rem) clamp(1.2rem, 3vw, 1.8rem);
+      padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.8rem, 2.5vw, 1.2rem);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(0.5rem, 2vw, 1rem);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      gap: 0;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.18);
       width: 100%;
       max-width: 500px;
-      margin: 0 auto 2rem;
+      margin: 0 auto 2.5rem;
+      border-radius: 1.8rem;
+      height: clamp(48px, 10vw, 56px);
+      overflow: hidden;
     }
     
     .bubble {
-      font-size: clamp(1.1rem, 3vw, 1.4rem);
-      padding: 0.6rem 0.8rem;
+      font-size: clamp(1.1rem, 3.2vw, 1.45rem);
+      padding: 0.4rem 0.8rem;
       border: none;
       background: transparent;
-      color: var(--dark);
+      color: var(--gray);
       text-align: center;
       flex: 1;
+      font-weight: 600;
+      min-width: 90px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -73,63 +120,171 @@
     .bubble::placeholder { 
       color: #999; 
       font-style: italic;
-      text-align: center;
+      font-weight: normal;
+    }
+    
+    .search-bar .separator {
+      font-size: clamp(2.6rem, 9.5vw, 4.7rem);
+      font-weight: 900;
+      color: var(--pink);
+      margin: 0 0.6rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
     }
     
     .mic-btn {
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.2);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: none;
       color: white;
-      font-size: clamp(1rem, 2.5vw, 1.3rem);
-      font-weight: 600;
-      padding: clamp(0.9rem, 2.5vw, 1.2rem) clamp(1.8rem, 4vw, 2.2rem);
-      border-radius: 999px;
+      width: clamp(64px, 14vw, 80px);
+      height: clamp(64px, 14vw, 80px);
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.6rem;
       transition: all 0.2s ease;
       margin: 1rem auto 3rem;
+      padding: 0;
     }
     
     .mic-btn:hover {
-      background: rgba(255,255,255,0.35);
-      transform: scale(1.03);
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+    
+    .mic-icon {
+      width: 40%;
+      height: 40%;
+      fill: currentColor;
     }
     
     .examples {
       font-size: clamp(1rem, 2.5vw, 1.3rem);
       margin-bottom: 3rem;
       line-height: 1.6;
+      color: white;
     }
     
     .examples strong {
       font-weight: 700;
+      color: white;
     }
     
-    .qr {
-      width: clamp(140px, 35vw, 180px);
-      height: auto;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+    /* SHARE MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      color: var(--black);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      max-width: 300px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 0.8rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .modal h3 {
+      margin-bottom: 1rem;
+      color: var(--pink);
+      font-weight: 700;
+    }
+    
+    .modal-qr {
+      width: 180px;
+      height: 180px;
+      margin: 1rem auto;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+    
+    .modal p {
+      font-size: 0.95rem;
+      margin: 0.8rem 0;
+      color: #444;
+    }
+    
+    .copy-link {
+      background: var(--pink);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 0.5rem;
     }
     
     @media (max-width: 480px) {
-      .search-bar {
-        flex-direction: column;
-        padding: 1.5rem;
+      .bump-btn {
+        top: 1.5rem;
+        right: 1.5rem;
+        padding: 0.5rem 0.9rem;
+        font-size: 0.9rem;
       }
-      .separator {
-        transform: rotate(90deg);
+      .search-bar {
+        flex-direction: row !important;
+        padding: 0.5rem 0.8rem;
+        height: 46px;
+        border-radius: 1.6rem;
+      }
+      .bubble {
+        font-size: 1.05rem;
+        min-width: 70px;
+      }
+      .search-bar .separator {
+        font-size: 2.2rem;
+        margin: 0 0.4rem;
+      }
+      .logo-bar {
+        font-size: 3.6rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>TWO <span class="separator">|</span> WORDS</h1>
+  <!-- BUMP BUTTON -->
+  <button class="bump-btn">Bump</button>
+
+  <div class="logo">
+    <span class="logo-text">TWO</span>
+    <span class="logo-bar">|</span>
+    <span class="logo-text">WORDS</span>
+  </div>
+  
+  <p class="subtitle">Safe sharing. Instant networking.</p>
 
   <div class="search-bar">
     <input type="text" class="bubble" placeholder="ninja" disabled />
@@ -137,21 +292,51 @@
     <input type="text" class="bubble" placeholder="waffle" disabled />
   </div>
 
-  <button class="mic-btn">
-    Tap & speak the two words
+  <button class="mic-btn" aria-label="Speak two words">
+    <svg class="mic-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15a.993.993 0 0 0-.98-.85c-.61 0-1.09.54-1 1.14.26 3 2.71 5.46 5.91 5.46s5.65-2.46 5.91-5.46c.09-.6-.39-1.14-1-1.14z"/>
+    </svg>
   </button>
 
   <div class="examples">
     Try: <strong>ninja | waffle</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>
   </div>
 
-  <img 
-    src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://two-words.app/ninja-waffle&bgcolor=E91E63&color=FFFFFF" 
-    alt="QR code" 
-    class="qr"
-  />
+  <!-- SHARE MODAL -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <button class="close-modal">×</button>
+      <h3>Share Your Words</h3>
+      <img 
+        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://two-words.app/ninja-waffle&bgcolor=E91E63&color=FFFFFF" 
+        alt="QR Code" 
+        class="modal-qr"
+      />
+      <p>Scan with camera</p>
+      <p>or <strong>bump phones</strong> to share</p>
+      <button class="copy-link" onclick="navigator.clipboard.writeText('https://two-words.app/ninja-waffle'); alert('Link copied!')">Copy Link</button>
+    </div>
+  </div>
 
   <script>
+    const bumpBtn = document.querySelector('.bump-btn');
+    const modal = document.getElementById('shareModal');
+    const closeModal = document.querySelector('.close-modal');
+
+    bumpBtn.addEventListener('click', () => {
+      modal.classList.add('active');
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+
     document.querySelector('.mic-btn').addEventListener('click', () => {
       alert('Say “ninja waffle” out loud…\n\nProfile appears in 1.2 seconds. Magic.');
     });
