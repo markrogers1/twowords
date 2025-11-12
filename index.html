@@ -7,7 +7,7 @@
   <title>TWO | WORDS</title>
   
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900;600;500&display=swap');
     
     :root {
       --pink: #E91E63;
@@ -32,34 +32,89 @@
       position: relative;
     }
     
-    .bump-btn {
+    /* TOP BAR: INFO | LOGIN */
+    .top-bar {
       position: absolute;
       top: 2rem;
+      left: 2rem;
       right: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    
+    .info-btn {
+      background: white;
+      color: var(--pink);
+      font-weight: 700;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .info-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .login-btn {
       background: white;
       color: var(--pink);
       font-weight: 700;
       font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      padding: 0.6rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 999px;
       border: none;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       transition: all 0.2s ease;
-      z-index: 10;
     }
     
-    .bump-btn:hover {
+    .login-btn:hover {
       transform: scale(1.05);
       box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
     
-    .logo {
+    /* LOGO BUTTON — CLEAN, ANIMATED, TAP TO SHARE */
+    .logo-btn {
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.1rem;
       margin-bottom: 0.3rem;
+      transition: transform 0.15s ease;
+    }
+    
+    .logo-btn:hover {
+      transform: scale(1.04);
+    }
+    
+    .logo-btn:active {
+      transform: scale(0.97);
+    }
+    
+    /* POP ANIMATION EVERY 4 SECONDS */
+    @keyframes pop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    
+    .logo-btn.popping {
+      animation: pop 0.6s ease-in-out;
     }
     
     .logo-text {
@@ -171,6 +226,7 @@
       color: white;
     }
     
+    /* MODALS */
     .modal {
       display: none;
       position: fixed;
@@ -193,7 +249,7 @@
       color: var(--black);
       padding: 2rem;
       border-radius: 1.5rem;
-      max-width: 300px;
+      max-width: 340px;
       text-align: center;
       position: relative;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
@@ -214,6 +270,38 @@
       margin-bottom: 1rem;
       color: var(--pink);
       font-weight: 700;
+      font-size: 1.4rem;
+    }
+    
+    .modal p {
+      font-size: 1rem;
+      margin: 0.9rem 0;
+      color: #444;
+      line-height: 1.5;
+    }
+    
+    .modal strong {
+      color: var(--black);
+    }
+    
+    .modal .highlight {
+      background: var(--pink);
+      color: white;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .modal ul {
+      text-align: left;
+      margin: 1rem 0;
+      padding-left: 1.2rem;
+      font-size: 0.95rem;
+      color: #555;
+    }
+    
+    .modal li {
+      margin: 0.5rem 0;
     }
     
     .modal-qr {
@@ -221,12 +309,6 @@
       height: 180px;
       margin: 1rem auto;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-    }
-    
-    .modal p {
-      font-size: 0.95rem;
-      margin: 0.8rem 0;
-      color: #444;
     }
     
     .copy-link {
@@ -241,11 +323,20 @@
     }
     
     @media (max-width: 480px) {
-      .bump-btn {
+      .top-bar {
         top: 1.5rem;
+        left: 1.5rem;
         right: 1.5rem;
-        padding: 0.5rem 0.9rem;
+      }
+      .info-btn, .login-btn {
         font-size: 0.9rem;
+      }
+      .info-btn {
+        width: 2rem;
+        height: 2rem;
+      }
+      .login-btn {
+        padding: 0.5rem 0.9rem;
       }
       .search-bar {
         flex-direction: row !important;
@@ -269,13 +360,18 @@
 </head>
 <body>
 
-  <button class="bump-btn">Bump</button>
+  <!-- TOP BAR: INFO | LOGIN -->
+  <div class="top-bar">
+    <button class="info-btn">i</button>
+    <button class="login-btn">Login</button>
+  </div>
 
-  <div class="logo">
+  <!-- LOGO BUTTON — POPS EVERY 4 SECONDS -->
+  <button class="logo-btn" id="logoBtn">
     <span class="logo-text">TWO</span>
     <span class="logo-bar">|</span>
     <span class="logo-text">WORDS</span>
-  </div>
+  </button>
   
   <p class="subtitle">Safe sharing. Instant networking.</p>
 
@@ -295,7 +391,26 @@
     Try: <strong>ninja | waffle</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>
   </div>
 
-  <!-- SHARE MODAL -->
+  <!-- INFO MODAL -->
+  <div class="modal" id="infoModal">
+    <div class="modal-content">
+      <button class="close-modal">×</button>
+      <h3>No phone numbers. No socials. No strangers.</h3>
+      <p>You get a <strong>random two-word code</strong> like <span class="highlight">ninja | waffle</span>.</p>
+      <p>And only people you <strong>choose to share it with</strong> can find you.</p>
+      <p><strong>Double opt-in:</strong> They say your words → You <strong>accept</strong> → Connection made.</p>
+      <ul>
+        <li>No one sees your phone number</li>
+        <li>No one sees your Instagram, LinkedIn, etc.</li>
+        <li>No spam, no creeps, no noise</li>
+        <li>You control who enters your network</li>
+      </ul>
+      <p>Share by <strong>voice</strong>, <strong>bump phones</strong>, or <strong>QR</strong>.</p>
+      <p><em>Networking — but make it safe.</em></p>
+    </div>
+  </div>
+
+  <!-- SHARE / BUMP MODAL -->
   <div class="modal" id="shareModal">
     <div class="modal-content">
       <button class="close-modal">×</button>
@@ -323,6 +438,7 @@
     const word1El = document.getElementById('word1');
     const word2El = document.getElementById('word2');
     const examplesEl = document.getElementById('examples');
+    const logoBtn = document.getElementById('logoBtn');
 
     let isSpinning = false;
 
@@ -335,7 +451,7 @@
       isSpinning = true;
 
       let spins = 0;
-      const maxSpins = 12 + Math.floor(Math.random() * 8); // 12–20 spins
+      const maxSpins = 12 + Math.floor(Math.random() * 8);
       const finalWord1 = getRandomWord();
       const finalWord2 = getRandomWord();
 
@@ -350,33 +466,59 @@
           word2El.textContent = finalWord2;
           examplesEl.innerHTML = `Try: <strong>${finalWord1} | ${finalWord2}</strong> • <strong>disco | penguin</strong> • <strong>grumpy | avocado</strong>`;
           isSpinning = false;
-
-          // Next spin in 3–5 seconds
           setTimeout(spinAndStop, 3000 + Math.random() * 2000);
         }
       }, 80);
     }
 
-    // Start first spin after 1s
     setTimeout(spinAndStop, 1000);
 
-    // Bump Modal
-    const bumpBtn = document.querySelector('.bump-btn');
-    const modal = document.getElementById('shareModal');
-    const closeModal = document.querySelector('.close-modal');
+    // LOGO POP ANIMATION EVERY 4 SECONDS
+    function popLogo() {
+      logoBtn.classList.add('popping');
+      setTimeout(() => {
+        logoBtn.classList.remove('popping');
+      }, 600);
+    }
 
-    bumpBtn.addEventListener('click', () => {
-      modal.classList.add('active');
+    // Start popping after 2s, then every 4s
+    setTimeout(() => {
+      popLogo();
+      setInterval(popLogo, 4000);
+    }, 2000);
+
+    // MODALS
+    const infoBtn = document.querySelector('.info-btn');
+    const loginBtn = document.querySelector('.login-btn');
+    const infoModal = document.getElementById('infoModal');
+    const shareModal = document.getElementById('shareModal');
+    const closeButtons = document.querySelectorAll('.close-modal');
+
+    infoBtn.addEventListener('click', () => {
+      infoModal.classList.add('active');
     });
 
-    closeModal.addEventListener('click', () => {
-      modal.classList.remove('active');
+    logoBtn.addEventListener('click', () => {
+      shareModal.classList.add('active');
     });
 
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-      }
+    loginBtn.addEventListener('click', () => {
+      alert('Login screen coming soon…\n\n(For now, enjoy the demo!)');
+    });
+
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        infoModal.classList.remove('active');
+        shareModal.classList.remove('active');
+      });
+    });
+
+    [infoModal, shareModal].forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
     });
 
     // Mic demo
