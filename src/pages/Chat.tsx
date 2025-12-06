@@ -17,6 +17,7 @@ export function Chat() {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showImagePermissionModal, setShowImagePermissionModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageCountRef = useRef<number>(0);
 
@@ -141,6 +142,7 @@ export function Chat() {
       .from('messages')
       .select('*')
       .or(`and(from_user_id.eq.${user.id},to_user_id.eq.${connection.otherUser.id}),and(from_user_id.eq.${connection.otherUser.id},to_user_id.eq.${user.id})`)
+      .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -149,6 +151,41 @@ export function Chat() {
     }
 
     setMessages(data || []);
+  };
+
+  const handleGrantImagePermission = async () => {
+    if (!selectedConnection || !user) return;
+
+    const connection = connections.find(c => c.id === selectedConnection);
+    if (!connection) return;
+
+    const isUserOne = connection.user_one_id === user.id;
+    const updateField = isUserOne ? 'user_one_allows_images' : 'user_two_allows_images';
+
+    const { error } = await supabase
+      .from('connections')
+      .update({ [updateField]: true })
+      .eq('id', selectedConnection);
+
+    if (error) {
+      console.error('Error granting image permission:', error);
+      return;
+    }
+
+    setShowImagePermissionModal(false);
+    loadConnections();
+  };
+
+  const canSendImages = (connection: Connection & { otherUser: Profile }) => {
+    if (!user) return false;
+    const isUserOne = connection.user_one_id === user.id;
+    return isUserOne ? connection.user_two_allows_images : connection.user_one_allows_images;
+  };
+
+  const hasGrantedImagePermission = (connection: Connection & { otherUser: Profile }) => {
+    if (!user) return false;
+    const isUserOne = connection.user_one_id === user.id;
+    return isUserOne ? connection.user_one_allows_images : connection.user_two_allows_images;
   };
 
   const sendMessage = async (e: React.FormEvent) => {
@@ -341,12 +378,65 @@ export function Chat() {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
+                      {msg.expires_at && (
+                        <span style={{ marginLeft: '0.5rem', opacity: 0.6 }}>
+                          • Expires in {Math.round((new Date(msg.expires_at).getTime() - Date.now()) / (1000 * 60 * 60))}h
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
               })}
               <div ref={messagesEndRef} />
             </div>
+
+            {selectedConnection && (() => {
+              const connection = connections.find(c => c.id === selectedConnection);
+              if (!connection) return null;
+
+              const userHasGranted = hasGrantedImagePermission(connection);
+              const otherUserHasGranted = canSendImages(connection);
+
+              return (
+                <>
+                  {(!userHasGranted || !otherUserHasGranted) && (
+                    <div style={{
+                      padding: '0.75rem',
+                      background: '#FEF3C7',
+                      borderTop: '1px solid #F59E0B',
+                      fontSize: '0.85rem',
+                      color: '#92400E',
+                      textAlign: 'center'
+                    }}>
+                      {!userHasGranted && (
+                        <div style={{ marginBottom: '0.5rem' }}>
+                          <strong>{selectedUser?.first_name}</strong> cannot send you images yet.{' '}
+                          <button
+                            onClick={() => setShowImagePermissionModal(true)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#D97706',
+                              textDecoration: 'underline',
+                              cursor: 'pointer',
+                              padding: 0,
+                              font: 'inherit'
+                            }}
+                          >
+                            Allow images
+                          </button>
+                        </div>
+                      )}
+                      {!otherUserHasGranted && (
+                        <div>
+                          <strong>{selectedUser?.first_name}</strong> hasn't granted you permission to send images yet.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             <form className="message-input-container" onSubmit={sendMessage}>
               <input
@@ -364,10 +454,90 @@ export function Chat() {
             <div className="empty-chat-content">
               <h3>Select a connection to start chatting</h3>
               <p>Your messages are encrypted end-to-end</p>
+              <p style={{ fontSize: '0.9rem', color: '#6B7280', marginTop: '1rem' }}>
+                All messages automatically delete after 24 hours
+              </p>
             </div>
           </div>
         )}
       </div>
+
+      {showImagePermissionModal && selectedUser && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => setShowImagePermissionModal(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '1rem',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>Allow Images from {selectedUser.first_name}?</h3>
+            <div style={{
+              background: '#FEF3C7',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              marginBottom: '1.5rem',
+              fontSize: '0.9rem',
+              color: '#92400E'
+            }}>
+              <strong>For your safety:</strong> Only allow images from people you trust. This permission lets {selectedUser.first_name} send you photos and images in this chat.
+            </div>
+            <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: '#4B5563' }}>
+              By allowing images, you'll be able to see any photos or images that {selectedUser.first_name} sends you. You can revoke this permission at any time from their profile.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+              <button
+                onClick={() => setShowImagePermissionModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '0.5rem',
+                  background: 'white',
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Not Now
+              </button>
+              <button
+                onClick={handleGrantImagePermission}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  background: '#3B82F6',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}
+              >
+                Allow Images
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

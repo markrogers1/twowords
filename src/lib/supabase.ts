@@ -29,6 +29,8 @@ export interface Message {
   to_user_id: string;
   encrypted_content: string;
   encryption_key_id?: string;
+  message_type: 'text' | 'image';
+  expires_at: string;
   created_at: string;
   read_at?: string;
 }
@@ -41,6 +43,8 @@ export interface Connection {
   requester_id: string;
   connection_type: 'friend' | 'business';
   tier: 'random' | 'acquaintance' | 'friend' | 'close_friend';
+  user_one_allows_images: boolean;
+  user_two_allows_images: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -15,6 +15,10 @@ interface Connection {
   id: string;
   connection_type: 'friend' | 'business';
   tier: 'random' | 'acquaintance' | 'friend' | 'close_friend';
+  user_one_id: string;
+  user_two_id: string;
+  user_one_allows_images: boolean;
+  user_two_allows_images: boolean;
 }
 
 const PLATFORMS: Record<string, { name: string; color: string; textColor: string; icon: string }> = {
@@ -67,7 +71,7 @@ export function ContactProfile() {
 
     const { data: connectionData } = await supabase
       .from('connections')
-      .select('id, connection_type, tier')
+      .select('id, connection_type, tier, user_one_id, user_two_id, user_one_allows_images, user_two_allows_images')
       .or(`and(user_one_id.eq.${user.id},user_two_id.eq.${userId}),and(user_one_id.eq.${userId},user_two_id.eq.${user.id})`)
       .eq('status', 'accepted')
       .maybeSingle();
@@ -115,6 +119,41 @@ export function ContactProfile() {
 
     setConnection({ ...connection, tier: newTier });
     setEditingTier(false);
+  };
+
+  const handleToggleImagePermission = async () => {
+    if (!connection || !user) return;
+
+    const isUserOne = connection.user_one_id === user.id;
+    const currentPermission = isUserOne ? connection.user_one_allows_images : connection.user_two_allows_images;
+    const updateField = isUserOne ? 'user_one_allows_images' : 'user_two_allows_images';
+
+    const { error } = await supabase
+      .from('connections')
+      .update({ [updateField]: !currentPermission })
+      .eq('id', connection.id);
+
+    if (error) {
+      console.error('Error updating image permission:', error);
+      return;
+    }
+
+    setConnection({
+      ...connection,
+      [updateField]: !currentPermission,
+    });
+  };
+
+  const hasGrantedImagePermission = () => {
+    if (!connection || !user) return false;
+    const isUserOne = connection.user_one_id === user.id;
+    return isUserOne ? connection.user_one_allows_images : connection.user_two_allows_images;
+  };
+
+  const otherUserHasGrantedPermission = () => {
+    if (!connection || !user) return false;
+    const isUserOne = connection.user_one_id === user.id;
+    return isUserOne ? connection.user_two_allows_images : connection.user_one_allows_images;
   };
 
   if (loading) {
@@ -225,6 +264,59 @@ export function ContactProfile() {
                       >
                         Save
                       </button>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#F0F9FF', borderRadius: '0.5rem', border: '1px solid #BFDBFE' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#1E40AF', display: 'block', marginBottom: '0.25rem' }}>
+                        Image Permissions
+                      </label>
+                      <div style={{ fontSize: '0.75rem', color: '#3B82F6', marginBottom: '0.75rem' }}>
+                        Control whether {profile.first_name} can send you images
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: 'white', borderRadius: '0.375rem' }}>
+                    <div>
+                      <div style={{ fontSize: '0.875rem', color: '#374151', fontWeight: '500' }}>
+                        {hasGrantedImagePermission() ? '✓ Images Allowed' : '⊘ Images Blocked'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '0.125rem' }}>
+                        {hasGrantedImagePermission()
+                          ? `${profile.first_name} can send you images`
+                          : `${profile.first_name} cannot send you images`
+                        }
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleToggleImagePermission}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        background: hasGrantedImagePermission() ? '#EF4444' : '#10B981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.375rem',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        fontSize: '0.875rem'
+                      }}
+                    >
+                      {hasGrantedImagePermission() ? 'Revoke' : 'Allow'}
+                    </button>
+                  </div>
+                  {!otherUserHasGrantedPermission() && (
+                    <div style={{
+                      marginTop: '0.75rem',
+                      padding: '0.5rem',
+                      background: '#FEF3C7',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.75rem',
+                      color: '#92400E'
+                    }}>
+                      {profile.first_name} hasn't granted you permission to send images yet.
                     </div>
                   )}
                 </div>
