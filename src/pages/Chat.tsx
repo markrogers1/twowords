@@ -235,9 +235,9 @@ export function Chat() {
             )}
           </div>
           <div className="sidebar-actions">
-            <button className="icon-btn" onClick={() => navigate('/profile')}>👤</button>
-            <button className="icon-btn" onClick={() => navigate('/connections')}>➕</button>
-            <button className="icon-btn" onClick={handleSignOut}>🚪</button>
+            <button className="action-btn" onClick={() => navigate('/profile')}>Profile</button>
+            <button className="action-btn" onClick={() => navigate('/connections')}>Add</button>
+            <button className="action-btn logout-btn" onClick={handleSignOut}>Exit</button>
           </div>
         </div>
 
