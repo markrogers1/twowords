@@ -8,6 +8,26 @@ import { Onboarding } from '../components/Onboarding';
 import QRCode from 'qrcode';
 import '../styles/chat.css';
 
+interface SocialLink {
+  id: string;
+  platform: string;
+  url: string;
+  category: 'personal' | 'business';
+}
+
+const PLATFORMS: Record<string, { name: string; color: string; textColor: string; icon: string }> = {
+  instagram: { name: 'Instagram', color: '#E4405F', textColor: '#FFFFFF', icon: 'IG' },
+  snapchat: { name: 'Snapchat', color: '#FFFC00', textColor: '#000000', icon: 'SC' },
+  facebook: { name: 'Facebook', color: '#1877F2', textColor: '#FFFFFF', icon: 'f' },
+  x: { name: 'X', color: '#000000', textColor: '#FFFFFF', icon: '𝕏' },
+  tiktok: { name: 'TikTok', color: '#000000', textColor: '#FFFFFF', icon: 'TT' },
+  whatsapp: { name: 'WhatsApp', color: '#25D366', textColor: '#FFFFFF', icon: 'WA' },
+  linkedin: { name: 'LinkedIn', color: '#0A66C2', textColor: '#FFFFFF', icon: 'in' },
+  github: { name: 'GitHub', color: '#181717', textColor: '#FFFFFF', icon: 'GH' },
+  website: { name: 'Website', color: '#6B7280', textColor: '#FFFFFF', icon: '🌐' },
+  email: { name: 'Email', color: '#EA4335', textColor: '#FFFFFF', icon: '✉️' },
+};
+
 export function Chat() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
@@ -22,6 +42,7 @@ export function Chat() {
   const [showImagePermissionModal, setShowImagePermissionModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const [selectedUserSocialLinks, setSelectedUserSocialLinks] = useState<SocialLink[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageCountRef = useRef<number>(0);
 
@@ -64,6 +85,7 @@ export function Chat() {
   useEffect(() => {
     if (selectedConnection) {
       loadMessages(selectedConnection);
+      loadSocialLinks(selectedConnection);
       lastMessageCountRef.current = 0;
 
       const connection = connections.find(c => c.id === selectedConnection);
@@ -177,6 +199,31 @@ export function Chat() {
     }
 
     setMessages(data || []);
+  };
+
+  const loadSocialLinks = async (connectionId: string) => {
+    const connection = connections.find(c => c.id === connectionId);
+    if (!connection || !user) return;
+
+    const { data: visibleLinks } = await supabase
+      .from('social_link_visibility')
+      .select('social_link_id')
+      .eq('connection_id', connectionId)
+      .eq('is_visible', true);
+
+    if (visibleLinks && visibleLinks.length > 0) {
+      const linkIds = visibleLinks.map(v => v.social_link_id);
+
+      const { data: linksData } = await supabase
+        .from('social_links')
+        .select('id, platform, url, category')
+        .in('id', linkIds)
+        .eq('user_id', connection.otherUser.id);
+
+      setSelectedUserSocialLinks(linksData || []);
+    } else {
+      setSelectedUserSocialLinks([]);
+    }
   };
 
   const handleGrantImagePermission = async () => {
@@ -385,7 +432,7 @@ export function Chat() {
                     {selectedUser.first_name[0]}{selectedUser.last_name[0]}
                   </div>
                 )}
-                <div>
+                <div style={{ flex: 1 }}>
                   <div className="chat-user-name">
                     {selectedUser.first_name} {selectedUser.last_name}
                   </div>
@@ -394,6 +441,48 @@ export function Chat() {
                   </div>
                 </div>
               </div>
+              {selectedUserSocialLinks.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  marginRight: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  {selectedUserSocialLinks.map((link) => {
+                    const platformInfo = PLATFORMS[link.platform] || { name: link.platform, color: '#6B7280', textColor: '#FFFFFF', icon: '🔗' };
+                    return (
+                      <a
+                        key={link.id}
+                        href={link.url.startsWith('http') ? link.url : `https://${link.url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: platformInfo.color,
+                          color: platformInfo.textColor,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          textDecoration: 'none',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          transition: 'transform 0.2s',
+                          flexShrink: 0
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        title={platformInfo.name}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {platformInfo.icon}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="messages-container">
