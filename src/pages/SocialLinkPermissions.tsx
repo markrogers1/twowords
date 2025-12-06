@@ -19,17 +19,17 @@ interface Visibility {
   is_visible: boolean;
 }
 
-const PLATFORMS: Record<string, { name: string; color: string; icon: string }> = {
-  instagram: { name: 'Instagram', color: '#E4405F', icon: '📷' },
-  snapchat: { name: 'Snapchat', color: '#FFFC00', icon: '👻' },
-  facebook: { name: 'Facebook', color: '#1877F2', icon: '👤' },
-  twitter: { name: 'Twitter/X', color: '#000000', icon: '🐦' },
-  tiktok: { name: 'TikTok', color: '#000000', icon: '🎵' },
-  whatsapp: { name: 'WhatsApp', color: '#25D366', icon: '💬' },
-  linkedin: { name: 'LinkedIn', color: '#0A66C2', icon: '💼' },
-  github: { name: 'GitHub', color: '#181717', icon: '💻' },
-  website: { name: 'Website', color: '#6B7280', icon: '🌐' },
-  email: { name: 'Email', color: '#EA4335', icon: '✉️' },
+const PLATFORMS: Record<string, { name: string; color: string; textColor: string; icon: string }> = {
+  instagram: { name: 'Instagram', color: '#E4405F', textColor: '#FFFFFF', icon: 'IG' },
+  snapchat: { name: 'Snapchat', color: '#FFFC00', textColor: '#000000', icon: 'SC' },
+  facebook: { name: 'Facebook', color: '#1877F2', textColor: '#FFFFFF', icon: 'f' },
+  x: { name: 'X', color: '#000000', textColor: '#FFFFFF', icon: '𝕏' },
+  tiktok: { name: 'TikTok', color: '#000000', textColor: '#FFFFFF', icon: 'TT' },
+  whatsapp: { name: 'WhatsApp', color: '#25D366', textColor: '#FFFFFF', icon: 'WA' },
+  linkedin: { name: 'LinkedIn', color: '#0A66C2', textColor: '#FFFFFF', icon: 'in' },
+  github: { name: 'GitHub', color: '#181717', textColor: '#FFFFFF', icon: 'GH' },
+  website: { name: 'Website', color: '#6B7280', textColor: '#FFFFFF', icon: '🌐' },
+  email: { name: 'Email', color: '#EA4335', textColor: '#FFFFFF', icon: '✉️' },
 };
 
 export function SocialLinkPermissions() {
@@ -153,7 +153,7 @@ export function SocialLinkPermissions() {
     return <div className="loading">Loading...</div>;
   }
 
-  const platformInfo = PLATFORMS[linkInfo.platform];
+  const platformInfo = PLATFORMS[linkInfo.platform] || { name: linkInfo.platform, color: '#6B7280', textColor: '#FFFFFF', icon: '🔗' };
 
   return (
     <div className="permissions-container">
@@ -166,7 +166,7 @@ export function SocialLinkPermissions() {
         <div className="link-info-card">
           <div
             className="platform-icon-large"
-            style={{ backgroundColor: platformInfo.color }}
+            style={{ backgroundColor: platformInfo.color, color: platformInfo.textColor }}
           >
             {platformInfo.icon}
           </div>

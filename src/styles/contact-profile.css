@@ -150,12 +150,14 @@
 }
 
 .social-icon {
-  font-size: 2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
 .social-name {
   font-size: 0.9rem;
   text-align: center;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {

@@ -16,22 +16,24 @@ interface SocialLink {
 interface PlatformInfo {
   name: string;
   color: string;
+  textColor: string;
   icon: string;
   placeholder: string;
+  urlPattern: string;
   category: 'personal' | 'business';
 }
 
 const PLATFORMS: Record<string, PlatformInfo> = {
-  instagram: { name: 'Instagram', color: '#E4405F', icon: '📷', placeholder: 'instagram.com/yourhandle', category: 'personal' },
-  snapchat: { name: 'Snapchat', color: '#FFFC00', icon: '👻', placeholder: 'snapchat.com/add/yourname', category: 'personal' },
-  facebook: { name: 'Facebook', color: '#1877F2', icon: '👤', placeholder: 'facebook.com/yourprofile', category: 'personal' },
-  twitter: { name: 'Twitter/X', color: '#000000', icon: '🐦', placeholder: 'twitter.com/yourhandle', category: 'personal' },
-  tiktok: { name: 'TikTok', color: '#000000', icon: '🎵', placeholder: 'tiktok.com/@yourhandle', category: 'personal' },
-  whatsapp: { name: 'WhatsApp', color: '#25D366', icon: '💬', placeholder: 'wa.me/yourphonenumber', category: 'personal' },
-  linkedin: { name: 'LinkedIn', color: '#0A66C2', icon: '💼', placeholder: 'linkedin.com/in/yourprofile', category: 'business' },
-  github: { name: 'GitHub', color: '#181717', icon: '💻', placeholder: 'github.com/yourusername', category: 'business' },
-  website: { name: 'Website', color: '#6B7280', icon: '🌐', placeholder: 'yourwebsite.com', category: 'business' },
-  email: { name: 'Email', color: '#EA4335', icon: '✉️', placeholder: 'your.email@example.com', category: 'business' },
+  instagram: { name: 'Instagram', color: '#E4405F', textColor: '#FFFFFF', icon: 'IG', placeholder: 'yourhandle', urlPattern: 'instagram.com/{username}', category: 'personal' },
+  snapchat: { name: 'Snapchat', color: '#FFFC00', textColor: '#000000', icon: 'SC', placeholder: 'yourname', urlPattern: 'snapchat.com/add/{username}', category: 'personal' },
+  facebook: { name: 'Facebook', color: '#1877F2', textColor: '#FFFFFF', icon: 'f', placeholder: 'yourprofile', urlPattern: 'facebook.com/{username}', category: 'personal' },
+  x: { name: 'X', color: '#000000', textColor: '#FFFFFF', icon: '𝕏', placeholder: 'yourhandle', urlPattern: 'x.com/{username}', category: 'personal' },
+  tiktok: { name: 'TikTok', color: '#000000', textColor: '#FFFFFF', icon: 'TT', placeholder: 'yourhandle', urlPattern: 'tiktok.com/@{username}', category: 'personal' },
+  whatsapp: { name: 'WhatsApp', color: '#25D366', textColor: '#FFFFFF', icon: 'WA', placeholder: 'yourphonenumber', urlPattern: 'wa.me/{username}', category: 'personal' },
+  linkedin: { name: 'LinkedIn', color: '#0A66C2', textColor: '#FFFFFF', icon: 'in', placeholder: 'yourprofile', urlPattern: 'linkedin.com/in/{username}', category: 'business' },
+  github: { name: 'GitHub', color: '#181717', textColor: '#FFFFFF', icon: 'GH', placeholder: 'yourusername', urlPattern: 'github.com/{username}', category: 'business' },
+  website: { name: 'Website', color: '#6B7280', textColor: '#FFFFFF', icon: '🌐', placeholder: 'yourwebsite.com', urlPattern: '{username}', category: 'business' },
+  email: { name: 'Email', color: '#EA4335', textColor: '#FFFFFF', icon: '✉️', placeholder: 'your.email@example.com', urlPattern: 'mailto:{username}', category: 'business' },
 };
 
 export function SocialLinks() {
@@ -77,13 +79,14 @@ export function SocialLinks() {
     setError('');
 
     const platformInfo = PLATFORMS[selectedPlatform];
+    const fullUrl = platformInfo.urlPattern.replace('{username}', url.trim());
 
     const { error: insertError } = await supabase
       .from('social_links')
       .insert({
         user_id: user.id,
         platform: selectedPlatform,
-        url: url.trim(),
+        url: fullUrl,
         category: platformInfo.category,
       });
 
@@ -118,8 +121,8 @@ export function SocialLinks() {
     await loadLinks();
   };
 
-  const personalLinks = links.filter(l => PLATFORMS[l.platform]?.category === 'personal');
-  const businessLinks = links.filter(l => PLATFORMS[l.platform]?.category === 'business');
+  const personalLinks = links.filter(l => l.category === 'personal');
+  const businessLinks = links.filter(l => l.category === 'business');
 
   return (
     <div className="social-links-container">
@@ -153,12 +156,12 @@ export function SocialLinks() {
 
           <div className="links-grid">
             {personalLinks.map((link) => {
-              const platformInfo = PLATFORMS[link.platform];
+              const platformInfo = PLATFORMS[link.platform] || { name: link.platform, color: '#6B7280', textColor: '#FFFFFF', icon: '🔗' };
               return (
                 <div key={link.id} className="link-card">
                   <div
                     className="platform-icon"
-                    style={{ backgroundColor: platformInfo.color }}
+                    style={{ backgroundColor: platformInfo.color, color: platformInfo.textColor }}
                   >
                     {platformInfo.icon}
                   </div>
@@ -202,12 +205,12 @@ export function SocialLinks() {
 
           <div className="links-grid">
             {businessLinks.map((link) => {
-              const platformInfo = PLATFORMS[link.platform];
+              const platformInfo = PLATFORMS[link.platform] || { name: link.platform, color: '#6B7280', textColor: '#FFFFFF', icon: '🔗' };
               return (
                 <div key={link.id} className="link-card">
                   <div
                     className="platform-icon"
-                    style={{ backgroundColor: platformInfo.color }}
+                    style={{ backgroundColor: platformInfo.color, color: platformInfo.textColor }}
                   >
                     {platformInfo.icon}
                   </div>
@@ -277,7 +280,12 @@ export function SocialLinks() {
               </div>
 
               <div className="form-group">
-                <label>URL</label>
+                <label>
+                  {selectedPlatform === 'email' ? 'Email Address' :
+                   selectedPlatform === 'whatsapp' ? 'Phone Number' :
+                   selectedPlatform === 'website' ? 'Website URL' :
+                   'Username'}
+                </label>
                 <input
                   type="text"
                   value={url}
