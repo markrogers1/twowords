@@ -18,6 +18,7 @@ export interface Profile {
   word_one: string;
   word_two: string;
   avatar_url?: string;
+  onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
 }

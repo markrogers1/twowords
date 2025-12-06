@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase, Profile, Message, Connection } from '../lib/supabase';
 import { encryptMessage, decryptMessage, generateEncryptionKey } from '../lib/encryption';
 import { playNotificationSound } from '../lib/notifications';
+import { Onboarding } from '../components/Onboarding';
 import '../styles/chat.css';
 
 export function Chat() {
@@ -15,6 +16,7 @@ export function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageCountRef = useRef<number>(0);
 
@@ -37,7 +39,22 @@ export function Chat() {
       return;
     }
     loadConnections();
+    checkOnboarding();
   }, [user, navigate]);
+
+  const checkOnboarding = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!error && data && !data.onboarding_completed) {
+      setShowOnboarding(true);
+    }
+  };
 
   useEffect(() => {
     if (selectedConnection) {
@@ -197,8 +214,15 @@ export function Chat() {
   }
 
   return (
-    <div className="chat-container">
-      <div className={`chat-sidebar ${isMobile && selectedConnection ? 'hidden' : ''}`}>
+    <>
+      {showOnboarding && user && (
+        <Onboarding
+          userId={user.id}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+      <div className="chat-container">
+        <div className={`chat-sidebar ${isMobile && selectedConnection ? 'hidden' : ''}`}>
         <div className="sidebar-header">
           <div className="profile-section">
             <h2 className="sidebar-title">TWO | WORDS</h2>
@@ -314,5 +338,6 @@ export function Chat() {
         )}
       </div>
     </div>
+    </>
   );
 }
