@@ -287,7 +287,11 @@ export function Chat() {
           <>
             <div className="chat-header">
               <button className="back-to-list-btn" onClick={handleBackToList}>←</button>
-              <div className="chat-user-info">
+              <div
+                className="chat-user-info"
+                onClick={() => navigate(`/contact/${selectedUser.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 {selectedUser.profile_image_url ? (
                   <img
                     src={selectedUser.profile_image_url}

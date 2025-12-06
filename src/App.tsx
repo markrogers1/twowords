@@ -6,6 +6,9 @@ import { Login } from './pages/Login';
 import { Chat } from './pages/Chat';
 import { Connections } from './pages/Connections';
 import { Profile } from './pages/Profile';
+import { SocialLinks } from './pages/SocialLinks';
+import { SocialLinkPermissions } from './pages/SocialLinkPermissions';
+import { ContactProfile } from './pages/ContactProfile';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -48,6 +51,30 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/social-links"
+        element={
+          <ProtectedRoute>
+            <SocialLinks />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/social-links/:linkId/permissions"
+        element={
+          <ProtectedRoute>
+            <SocialLinkPermissions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contact/:userId"
+        element={
+          <ProtectedRoute>
+            <ContactProfile />
           </ProtectedRoute>
         }
       />

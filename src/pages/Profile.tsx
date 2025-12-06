@@ -221,6 +221,17 @@ export function Profile() {
         </div>
 
         <div className="profile-info-box">
+          <h3>Social Links</h3>
+          <p>Manage your social media links and control who can see them.</p>
+          <button
+            className="social-links-btn"
+            onClick={() => navigate('/social-links')}
+          >
+            Manage Social Links
+          </button>
+        </div>
+
+        <div className="profile-info-box">
           <h3>How it works</h3>
           <ul>
             <li>Your two words are unique to you in your country</li>

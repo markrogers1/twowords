@@ -167,6 +167,43 @@
   font-size: 0.9rem;
 }
 
+.connection-type-selector {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.connection-type-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--black);
+}
+
+.connection-type-label input[type="radio"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pink);
+}
+
+.connection-type-label span {
+  user-select: none;
+}
+
+.connection-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--pink);
+  color: white;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
 .connect-btn {
   background: var(--pink);
   color: white;

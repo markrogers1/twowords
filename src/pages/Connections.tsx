@@ -12,6 +12,7 @@ export function Connections() {
   const [requests, setRequests] = useState<(Connection & { otherProfile: Profile })[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [connectionType, setConnectionType] = useState<'friend' | 'business'>('friend');
 
   useEffect(() => {
     if (!user) {
@@ -97,7 +98,7 @@ export function Connections() {
     setLoading(false);
   };
 
-  const sendConnectionRequest = async (toUserId: string) => {
+  const sendConnectionRequest = async (toUserId: string, type: 'friend' | 'business') => {
     if (!user) return;
 
     const { data: existingConnection } = await supabase
@@ -122,6 +123,7 @@ export function Connections() {
       user_two_id: userId2,
       status: 'pending',
       requester_id: user.id,
+      connection_type: type,
     });
 
     if (error) {
@@ -131,6 +133,7 @@ export function Connections() {
 
     setSearchResult(null);
     setSearchWords({ word1: '', word2: '', country: 'US' });
+    setConnectionType('friend');
     alert('Connection request sent!');
     loadRequests();
   };
@@ -231,10 +234,32 @@ export function Connections() {
                   <h3>{searchResult.first_name} {searchResult.last_name}</h3>
                   <p className="result-username">{searchResult.word_one} | {searchResult.word_two}</p>
                   <p className="result-country">{searchResult.country}</p>
+                  <div className="connection-type-selector">
+                    <label className="connection-type-label">
+                      <input
+                        type="radio"
+                        name="connectionType"
+                        value="friend"
+                        checked={connectionType === 'friend'}
+                        onChange={() => setConnectionType('friend')}
+                      />
+                      <span>Friend</span>
+                    </label>
+                    <label className="connection-type-label">
+                      <input
+                        type="radio"
+                        name="connectionType"
+                        value="business"
+                        checked={connectionType === 'business'}
+                        onChange={() => setConnectionType('business')}
+                      />
+                      <span>Business</span>
+                    </label>
+                  </div>
                 </div>
                 <button
                   className="connect-btn"
-                  onClick={() => sendConnectionRequest(searchResult.id)}
+                  onClick={() => sendConnectionRequest(searchResult.id, connectionType)}
                 >
                   Send Request
                 </button>
@@ -263,6 +288,9 @@ export function Connections() {
                   <div className="request-info">
                     <h3>{req.otherProfile.first_name} {req.otherProfile.last_name}</h3>
                     <p>{req.otherProfile.word_one} | {req.otherProfile.word_two}</p>
+                    <p className="connection-type-badge">
+                      {req.connection_type === 'business' ? 'Business Contact' : 'Friend'}
+                    </p>
                   </div>
                   <div className="request-actions">
                     <button

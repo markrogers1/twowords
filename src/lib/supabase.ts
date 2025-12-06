@@ -39,6 +39,7 @@ export interface Connection {
   user_two_id: string;
   status: 'pending' | 'accepted' | 'rejected';
   requester_id: string;
+  connection_type: 'friend' | 'business';
   created_at: string;
   updated_at: string;
 }

@@ -252,6 +252,31 @@
   cursor: not-allowed;
 }
 
+.profile-info-box p {
+  color: var(--gray);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+.social-links-btn {
+  background: var(--pink);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.social-links-btn:hover {
+  background: #d81b60;
+  transform: translateY(-1px);
+}
+
 @media (max-width: 480px) {
   .profile-card {
     padding: 2rem 1.5rem;
