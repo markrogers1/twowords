@@ -5,6 +5,7 @@ import { supabase, Profile, Message, Connection } from '../lib/supabase';
 import { encryptMessage, decryptMessage, generateEncryptionKey } from '../lib/encryption';
 import { playNotificationSound } from '../lib/notifications';
 import { Onboarding } from '../components/Onboarding';
+import QRCode from 'qrcode';
 import '../styles/chat.css';
 
 export function Chat() {
@@ -18,6 +19,8 @@ export function Chat() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showImagePermissionModal, setShowImagePermissionModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastMessageCountRef = useRef<number>(0);
 
@@ -98,6 +101,22 @@ export function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (showQRModal && profile) {
+      const username = `${profile.word_one} | ${profile.word_two}`;
+      QRCode.toDataURL(username, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      })
+        .then(url => setQrCodeDataUrl(url))
+        .catch(err => console.error('Error generating QR code:', err));
+    }
+  }, [showQRModal, profile]);
 
   const loadConnections = async () => {
     if (!user) return;
@@ -262,7 +281,11 @@ export function Chat() {
       <div className="chat-container">
         <div className={`chat-sidebar ${isMobile && selectedConnection ? 'hidden' : ''}`}>
         <div className="sidebar-header">
-          <div className="profile-section">
+          <div
+            className="profile-section"
+            onClick={() => setShowQRModal(true)}
+            style={{ cursor: 'pointer' }}
+          >
             <h2 className="sidebar-title">TWO | WORDS</h2>
             {profile && (
               <div className="user-words">
@@ -535,6 +558,127 @@ export function Chat() {
                 Allow Images
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showQRModal && profile && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => setShowQRModal(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              maxWidth: '450px',
+              width: '90%',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+              textAlign: 'center'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.5rem', color: '#111827' }}>
+              My TWO | WORDS
+            </h2>
+            <p style={{ fontSize: '0.9rem', color: '#6B7280', marginBottom: '2rem' }}>
+              Show this to someone to connect
+            </p>
+
+            <div style={{
+              background: 'linear-gradient(135deg, #667EEA 0%, #764BA2 100%)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              marginBottom: '2rem'
+            }}>
+              <div style={{
+                fontSize: '2.5rem',
+                fontWeight: '700',
+                color: 'white',
+                letterSpacing: '0.05em',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}>
+                {profile.word_one} | {profile.word_two}
+              </div>
+            </div>
+
+            {qrCodeDataUrl && (
+              <div style={{
+                background: 'white',
+                padding: '1.5rem',
+                borderRadius: '1rem',
+                border: '2px solid #E5E7EB',
+                marginBottom: '1.5rem'
+              }}>
+                <img
+                  src={qrCodeDataUrl}
+                  alt="QR Code"
+                  style={{
+                    width: '100%',
+                    maxWidth: '300px',
+                    height: 'auto',
+                    display: 'block',
+                    margin: '0 auto'
+                  }}
+                />
+                <p style={{
+                  fontSize: '0.75rem',
+                  color: '#9CA3AF',
+                  marginTop: '1rem',
+                  marginBottom: 0
+                }}>
+                  Scan to get my username
+                </p>
+              </div>
+            )}
+
+            <div style={{
+              background: '#F9FAFB',
+              padding: '1rem',
+              borderRadius: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
+              <p style={{
+                fontSize: '0.85rem',
+                color: '#4B5563',
+                margin: 0,
+                lineHeight: '1.5'
+              }}>
+                <strong>{profile.first_name} {profile.last_name}</strong> • {profile.country}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowQRModal(false)}
+              style={{
+                width: '100%',
+                padding: '0.875rem',
+                background: '#111827',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.75rem',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '600',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#1F2937'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#111827'}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
