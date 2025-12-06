@@ -78,7 +78,7 @@ export function Home() {
         <span className="logo-text">WORDS</span>
       </button>
 
-      <p className="subtitle">Safe sharing. Instant networking.</p>
+      <p className="subtitle">Connect safely. Share your two words, not your number.</p>
 
       <div className="search-bar">
         <div className="bubble">{word1}</div>
@@ -100,18 +100,37 @@ export function Home() {
         <div className="modal active" onClick={() => setShowInfoModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal" onClick={() => setShowInfoModal(false)}>×</button>
-            <h3>No phone numbers. No socials. No strangers.</h3>
-            <p>You get a <strong>random two-word code</strong> like <span className="highlight">ninja | waffle</span>.</p>
-            <p>And only people you <strong>choose to share it with</strong> can find you.</p>
-            <p><strong>Double opt-in:</strong> They say your words → You <strong>accept</strong> → Connection made.</p>
-            <ul>
-              <li>No one sees your phone number</li>
-              <li>No one sees your Instagram, LinkedIn, etc.</li>
-              <li>No spam, no creeps, no noise</li>
-              <li>You control who enters your network</li>
+            <h3>Privacy-First Contact Sharing</h3>
+
+            <div style={{ background: '#F0F9FF', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>
+              <p style={{ margin: 0, fontSize: '0.95rem' }}>
+                <strong>Meet someone new?</strong> Don't give out your phone number or Instagram right away. Share your two words instead.
+              </p>
+            </div>
+
+            <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>How it works:</h4>
+            <ul style={{ lineHeight: '1.7' }}>
+              <li>You get a unique two-word code like <span className="highlight">ninja | waffle</span></li>
+              <li>Share it with someone you meet (by voice, text, or QR)</li>
+              <li>They search for your words and send a request</li>
+              <li><strong>You accept</strong> - now you can chat and share links safely</li>
             </ul>
-            <p>Share by <strong>voice</strong>, <strong>bump phones</strong>, or <strong>QR</strong>.</p>
-            <p><em>Networking — but make it safe.</em></p>
+
+            <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>You stay in control:</h4>
+            <ul style={{ lineHeight: '1.7' }}>
+              <li>No one sees your phone number</li>
+              <li>Choose who sees your Instagram, Snapchat, LinkedIn, etc.</li>
+              <li>Set relationship levels: Just Met, Friend, Close Friend</li>
+              <li>Messages are encrypted - only you and your connection can read them</li>
+              <li>No spam, no creeps, no noise</li>
+            </ul>
+
+            <div style={{ background: '#ECFDF5', padding: '1rem', borderRadius: '0.5rem', marginTop: '1.5rem' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#065F46' }}>
+                <strong>Perfect for:</strong> Parties, events, classes, networking, or anywhere you meet new people and want to stay connected without oversharing.
+              </p>
+            </div>
+
             <button className="cta-btn" onClick={() => { setShowInfoModal(false); navigate('/signup'); }}>Get Started</button>
           </div>
         </div>
@@ -121,9 +140,20 @@ export function Home() {
         <div className="modal active" onClick={() => setShowShareModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-modal" onClick={() => setShowShareModal(false)}>×</button>
-            <h3>Get Started</h3>
-            <p>Create your account to get your unique two words and start connecting safely.</p>
-            <button className="cta-btn" onClick={() => { setShowShareModal(false); navigate('/signup'); }}>Sign Up</button>
+            <h3>Ready to Connect Safely?</h3>
+            <p style={{ fontSize: '1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Create your account and get your unique two-word code. Start meeting people without giving out your phone number or social media.
+            </p>
+            <div style={{ background: '#F9FAFB', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#4B5563' }}>
+                <strong>What you'll get:</strong><br/>
+                • Your unique two-word code<br/>
+                • Encrypted messaging<br/>
+                • Control over who sees your social links<br/>
+                • A safer way to network
+              </p>
+            </div>
+            <button className="cta-btn" onClick={() => { setShowShareModal(false); navigate('/signup'); }}>Create Account</button>
           </div>
         </div>
       )}
