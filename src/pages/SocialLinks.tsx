@@ -55,19 +55,26 @@ export function SocialLinks() {
   }, [user, navigate]);
 
   const loadLinks = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping loadLinks');
+      return;
+    }
+
+    console.log('Loading links for user:', user.id);
 
     const { data, error } = await supabase
       .from('social_links')
-      .select('*')
+      .select('id, user_id, platform, url, category, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error loading links:', error);
+      setError('Failed to load social links');
       return;
     }
 
+    console.log('Loaded links:', data);
     setLinks(data || []);
   };
 
@@ -124,6 +131,10 @@ export function SocialLinks() {
   const personalLinks = links.filter(l => l.category === 'personal');
   const businessLinks = links.filter(l => l.category === 'business');
 
+  console.log('Total links:', links.length);
+  console.log('Personal links:', personalLinks.length, personalLinks);
+  console.log('Business links:', businessLinks.length, businessLinks);
+
   return (
     <div className="social-links-container">
       <div className="social-links-header">
@@ -132,8 +143,21 @@ export function SocialLinks() {
       </div>
 
       <div className="social-links-content">
+        {error && <div className="error-banner" style={{padding: '1rem', background: '#fee', color: '#c00', borderRadius: '8px', marginBottom: '1rem'}}>{error}</div>}
+
         <div className="social-links-intro">
           <p>Add your social media links and control who can see them. You can show different links to friends vs business contacts.</p>
+          <details style={{marginTop: '1rem', fontSize: '0.9rem', color: '#666'}}>
+            <summary style={{cursor: 'pointer'}}>Debug Info</summary>
+            <pre style={{background: '#f5f5f5', padding: '1rem', borderRadius: '4px', fontSize: '0.8rem', overflow: 'auto'}}>
+              {JSON.stringify({
+                totalLinks: links.length,
+                personalCount: personalLinks.length,
+                businessCount: businessLinks.length,
+                links: links
+              }, null, 2)}
+            </pre>
+          </details>
         </div>
 
         <div className="links-section">
