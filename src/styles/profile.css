@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@900;600;500&display=swap');
+
+:root {
+  --pink: #E91E63;
+  --black: #1A1A1A;
+  --gray: #555555;
+  --white: #FFFFFF;
+}
+
 .profile-container {
   min-height: 100vh;
   min-height: 100dvh;
@@ -7,6 +16,21 @@
   justify-content: center;
   padding: 2rem;
   font-family: 'Inter', sans-serif;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: var(--pink);
 }
 
 .profile-card {
