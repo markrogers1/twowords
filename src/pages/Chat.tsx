@@ -10,7 +10,7 @@ export function Chat() {
   const { user, profile, signOut } = useAuth();
   const [connections, setConnections] = useState<(Connection & { otherUser: Profile })[]>([]);
   const [selectedConnection, setSelectedConnection] = useState<string | null>(null);
-  const [messages, setMessages] = useState<(Message & { from_profile?: Profile })[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -55,9 +55,9 @@ export function Chat() {
   const loadConnections = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    const { data: connectionsData, error } = await supabase
       .from('connections')
-      .select('*, profiles!connections_user_one_id_fkey(*), profiles!connections_user_two_id_fkey(*)')
+      .select('*')
       .or(`user_one_id.eq.${user.id},user_two_id.eq.${user.id}`);
 
     if (error) {
@@ -65,16 +65,22 @@ export function Chat() {
       return;
     }
 
-    const connectionsWithProfiles = data?.map((conn: any) => {
-      const otherUser = conn.user_one_id === user.id
-        ? conn.profiles
-        : conn.profiles;
+    const connectionsWithProfiles = await Promise.all(
+      (connectionsData || []).map(async (conn) => {
+        const otherUserId = conn.user_one_id === user.id ? conn.user_two_id : conn.user_one_id;
 
-      return {
-        ...conn,
-        otherUser: Array.isArray(otherUser) ? otherUser[0] : otherUser,
-      };
-    }) || [];
+        const { data: otherUser } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', otherUserId)
+          .maybeSingle();
+
+        return {
+          ...conn,
+          otherUser: otherUser!,
+        };
+      })
+    );
 
     setConnections(connectionsWithProfiles);
     setLoading(false);
@@ -86,7 +92,7 @@ export function Chat() {
 
     const { data, error } = await supabase
       .from('messages')
-      .select('*, profiles!messages_from_user_id_fkey(*)')
+      .select('*')
       .or(`and(from_user_id.eq.${user.id},to_user_id.eq.${connection.otherUser.id}),and(from_user_id.eq.${connection.otherUser.id},to_user_id.eq.${user.id})`)
       .order('created_at', { ascending: true });
 
@@ -95,12 +101,7 @@ export function Chat() {
       return;
     }
 
-    const messagesWithProfiles = data?.map((msg: any) => ({
-      ...msg,
-      from_profile: Array.isArray(msg.profiles) ? msg.profiles[0] : msg.profiles,
-    })) || [];
-
-    setMessages(messagesWithProfiles);
+    setMessages(data || []);
   };
 
   const sendMessage = async (e: React.FormEvent) => {

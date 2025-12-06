@@ -24,9 +24,9 @@ export function Connections() {
   const loadRequests = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    const { data: requestsData, error } = await supabase
       .from('connection_requests')
-      .select('*, profiles!connection_requests_from_user_id_fkey(*), profiles!connection_requests_to_user_id_fkey(*)')
+      .select('*')
       .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
       .eq('status', 'pending');
 
@@ -35,11 +35,27 @@ export function Connections() {
       return;
     }
 
-    const requestsWithProfiles = data?.map((req: any) => ({
-      ...req,
-      from_profile: Array.isArray(req.profiles) ? req.profiles[0] : req.profiles,
-      to_profile: Array.isArray(req.profiles) ? req.profiles[1] : req.profiles,
-    })) || [];
+    const requestsWithProfiles = await Promise.all(
+      (requestsData || []).map(async (req) => {
+        const { data: fromProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', req.from_user_id)
+          .maybeSingle();
+
+        const { data: toProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', req.to_user_id)
+          .maybeSingle();
+
+        return {
+          ...req,
+          from_profile: fromProfile!,
+          to_profile: toProfile!,
+        };
+      })
+    );
 
     setRequests(requestsWithProfiles);
   };
