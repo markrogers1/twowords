@@ -104,7 +104,8 @@ export function Chat() {
     const { data: connectionsData, error } = await supabase
       .from('connections')
       .select('*')
-      .or(`user_one_id.eq.${user.id},user_two_id.eq.${user.id}`);
+      .or(`user_one_id.eq.${user.id},user_two_id.eq.${user.id}`)
+      .eq('status', 'accepted');
 
     if (error) {
       console.error('Error loading connections:', error);
@@ -256,9 +257,17 @@ export function Chat() {
                 className={`connection-item ${selectedConnection === conn.id ? 'active' : ''}`}
                 onClick={() => setSelectedConnection(conn.id)}
               >
-                <div className="connection-avatar">
-                  {conn.otherUser.first_name[0]}{conn.otherUser.last_name[0]}
-                </div>
+                {conn.otherUser.profile_image_url ? (
+                  <img
+                    src={conn.otherUser.profile_image_url}
+                    alt={`${conn.otherUser.first_name} ${conn.otherUser.last_name}`}
+                    className="connection-avatar-image"
+                  />
+                ) : (
+                  <div className="connection-avatar">
+                    {conn.otherUser.first_name[0]}{conn.otherUser.last_name[0]}
+                  </div>
+                )}
                 <div className="connection-info">
                   <div className="connection-name">
                     {conn.otherUser.first_name} {conn.otherUser.last_name}
@@ -279,9 +288,17 @@ export function Chat() {
             <div className="chat-header">
               <button className="back-to-list-btn" onClick={handleBackToList}>←</button>
               <div className="chat-user-info">
-                <div className="chat-avatar">
-                  {selectedUser.first_name[0]}{selectedUser.last_name[0]}
-                </div>
+                {selectedUser.profile_image_url ? (
+                  <img
+                    src={selectedUser.profile_image_url}
+                    alt={`${selectedUser.first_name} ${selectedUser.last_name}`}
+                    className="chat-avatar-image"
+                  />
+                ) : (
+                  <div className="chat-avatar">
+                    {selectedUser.first_name[0]}{selectedUser.last_name[0]}
+                  </div>
+                )}
                 <div>
                   <div className="chat-user-name">
                     {selectedUser.first_name} {selectedUser.last_name}

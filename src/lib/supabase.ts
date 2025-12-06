@@ -17,7 +17,7 @@ export interface Profile {
   country: string;
   word_one: string;
   word_two: string;
-  avatar_url?: string;
+  profile_image_url?: string;
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
@@ -37,14 +37,8 @@ export interface Connection {
   id: string;
   user_one_id: string;
   user_two_id: string;
-  created_at: string;
-}
-
-export interface ConnectionRequest {
-  id: string;
-  from_user_id: string;
-  to_user_id: string;
   status: 'pending' | 'accepted' | 'rejected';
+  requester_id: string;
   created_at: string;
   updated_at: string;
 }

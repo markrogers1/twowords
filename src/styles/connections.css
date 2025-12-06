@@ -137,6 +137,15 @@
   flex-shrink: 0;
 }
 
+.result-avatar-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pink);
+  flex-shrink: 0;
+}
+
 .result-info {
   flex: 1;
 }
@@ -218,6 +227,15 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.request-avatar-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pink);
   flex-shrink: 0;
 }
 

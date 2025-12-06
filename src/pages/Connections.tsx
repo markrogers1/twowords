@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase, Profile, ConnectionRequest } from '../lib/supabase';
+import { supabase, Profile, Connection } from '../lib/supabase';
 import '../styles/connections.css';
 
 export function Connections() {
@@ -9,7 +9,7 @@ export function Connections() {
   const { user } = useAuth();
   const [searchWords, setSearchWords] = useState({ word1: '', word2: '', country: 'US' });
   const [searchResult, setSearchResult] = useState<Profile | null>(null);
-  const [requests, setRequests] = useState<(ConnectionRequest & { from_profile: Profile; to_profile: Profile })[]>([]);
+  const [requests, setRequests] = useState<(Connection & { otherProfile: Profile })[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -24,10 +24,10 @@ export function Connections() {
   const loadRequests = async () => {
     if (!user) return;
 
-    const { data: requestsData, error } = await supabase
-      .from('connection_requests')
+    const { data: connectionsData, error } = await supabase
+      .from('connections')
       .select('*')
-      .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
+      .or(`user_one_id.eq.${user.id},user_two_id.eq.${user.id}`)
       .eq('status', 'pending');
 
     if (error) {
@@ -36,23 +36,18 @@ export function Connections() {
     }
 
     const requestsWithProfiles = await Promise.all(
-      (requestsData || []).map(async (req) => {
-        const { data: fromProfile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', req.from_user_id)
-          .maybeSingle();
+      (connectionsData || []).map(async (conn) => {
+        const otherUserId = conn.user_one_id === user.id ? conn.user_two_id : conn.user_one_id;
 
-        const { data: toProfile } = await supabase
+        const { data: otherProfile } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', req.to_user_id)
+          .eq('id', otherUserId)
           .maybeSingle();
 
         return {
-          ...req,
-          from_profile: fromProfile!,
-          to_profile: toProfile!,
+          ...conn,
+          otherProfile: otherProfile!,
         };
       })
     );
@@ -105,17 +100,6 @@ export function Connections() {
   const sendConnectionRequest = async (toUserId: string) => {
     if (!user) return;
 
-    const { data: existingRequest } = await supabase
-      .from('connection_requests')
-      .select('*')
-      .or(`and(from_user_id.eq.${user.id},to_user_id.eq.${toUserId}),and(from_user_id.eq.${toUserId},to_user_id.eq.${user.id})`)
-      .maybeSingle();
-
-    if (existingRequest) {
-      setError('Connection request already exists');
-      return;
-    }
-
     const { data: existingConnection } = await supabase
       .from('connections')
       .select('*')
@@ -123,14 +107,21 @@ export function Connections() {
       .maybeSingle();
 
     if (existingConnection) {
-      setError('Already connected with this user');
+      if (existingConnection.status === 'pending') {
+        setError('Connection request already exists');
+      } else {
+        setError('Already connected with this user');
+      }
       return;
     }
 
-    const { error } = await supabase.from('connection_requests').insert({
-      from_user_id: user.id,
-      to_user_id: toUserId,
+    const [userId1, userId2] = [user.id, toUserId].sort();
+
+    const { error } = await supabase.from('connections').insert({
+      user_one_id: userId1,
+      user_two_id: userId2,
       status: 'pending',
+      requester_id: user.id,
     });
 
     if (error) {
@@ -144,39 +135,27 @@ export function Connections() {
     loadRequests();
   };
 
-  const handleAcceptRequest = async (requestId: string, fromUserId: string) => {
+  const handleAcceptRequest = async (connectionId: string) => {
     if (!user) return;
 
-    const { error: updateError } = await supabase
-      .from('connection_requests')
+    const { error } = await supabase
+      .from('connections')
       .update({ status: 'accepted' })
-      .eq('id', requestId);
+      .eq('id', connectionId);
 
-    if (updateError) {
-      console.error('Error updating request:', updateError);
-      return;
-    }
-
-    const [userId1, userId2] = [user.id, fromUserId].sort();
-
-    const { error: connectionError } = await supabase.from('connections').insert({
-      user_one_id: userId1,
-      user_two_id: userId2,
-    });
-
-    if (connectionError) {
-      console.error('Error creating connection:', connectionError);
+    if (error) {
+      console.error('Error accepting request:', error);
       return;
     }
 
     loadRequests();
   };
 
-  const handleRejectRequest = async (requestId: string) => {
+  const handleRejectRequest = async (connectionId: string) => {
     const { error } = await supabase
-      .from('connection_requests')
+      .from('connections')
       .update({ status: 'rejected' })
-      .eq('id', requestId);
+      .eq('id', connectionId);
 
     if (error) {
       console.error('Error rejecting request:', error);
@@ -186,8 +165,8 @@ export function Connections() {
     loadRequests();
   };
 
-  const incomingRequests = requests.filter(r => r.to_user_id === user?.id);
-  const outgoingRequests = requests.filter(r => r.from_user_id === user?.id);
+  const incomingRequests = requests.filter(r => r.requester_id !== user?.id);
+  const outgoingRequests = requests.filter(r => r.requester_id === user?.id);
 
   return (
     <div className="connections-container">
@@ -237,9 +216,17 @@ export function Connections() {
           {searchResult && (
             <div className="search-result">
               <div className="result-card">
-                <div className="result-avatar">
-                  {searchResult.first_name[0]}{searchResult.last_name[0]}
-                </div>
+                {searchResult.profile_image_url ? (
+                  <img
+                    src={searchResult.profile_image_url}
+                    alt={`${searchResult.first_name} ${searchResult.last_name}`}
+                    className="result-avatar-image"
+                  />
+                ) : (
+                  <div className="result-avatar">
+                    {searchResult.first_name[0]}{searchResult.last_name[0]}
+                  </div>
+                )}
                 <div className="result-info">
                   <h3>{searchResult.first_name} {searchResult.last_name}</h3>
                   <p className="result-username">{searchResult.word_one} | {searchResult.word_two}</p>
@@ -262,17 +249,25 @@ export function Connections() {
               <h2>Incoming Requests</h2>
               {incomingRequests.map((req) => (
                 <div key={req.id} className="request-card">
-                  <div className="request-avatar">
-                    {req.from_profile.first_name[0]}{req.from_profile.last_name[0]}
-                  </div>
+                  {req.otherProfile.profile_image_url ? (
+                    <img
+                      src={req.otherProfile.profile_image_url}
+                      alt={`${req.otherProfile.first_name} ${req.otherProfile.last_name}`}
+                      className="request-avatar-image"
+                    />
+                  ) : (
+                    <div className="request-avatar">
+                      {req.otherProfile.first_name[0]}{req.otherProfile.last_name[0]}
+                    </div>
+                  )}
                   <div className="request-info">
-                    <h3>{req.from_profile.first_name} {req.from_profile.last_name}</h3>
-                    <p>{req.from_profile.word_one} | {req.from_profile.word_two}</p>
+                    <h3>{req.otherProfile.first_name} {req.otherProfile.last_name}</h3>
+                    <p>{req.otherProfile.word_one} | {req.otherProfile.word_two}</p>
                   </div>
                   <div className="request-actions">
                     <button
                       className="accept-btn"
-                      onClick={() => handleAcceptRequest(req.id, req.from_user_id)}
+                      onClick={() => handleAcceptRequest(req.id)}
                     >
                       Accept
                     </button>
@@ -293,12 +288,20 @@ export function Connections() {
               <h2>Pending Requests</h2>
               {outgoingRequests.map((req) => (
                 <div key={req.id} className="request-card">
-                  <div className="request-avatar">
-                    {req.to_profile.first_name[0]}{req.to_profile.last_name[0]}
-                  </div>
+                  {req.otherProfile.profile_image_url ? (
+                    <img
+                      src={req.otherProfile.profile_image_url}
+                      alt={`${req.otherProfile.first_name} ${req.otherProfile.last_name}`}
+                      className="request-avatar-image"
+                    />
+                  ) : (
+                    <div className="request-avatar">
+                      {req.otherProfile.first_name[0]}{req.otherProfile.last_name[0]}
+                    </div>
+                  )}
                   <div className="request-info">
-                    <h3>{req.to_profile.first_name} {req.to_profile.last_name}</h3>
-                    <p>{req.to_profile.word_one} | {req.to_profile.word_two}</p>
+                    <h3>{req.otherProfile.first_name} {req.otherProfile.last_name}</h3>
+                    <p>{req.otherProfile.word_one} | {req.otherProfile.word_two}</p>
                     <p className="request-status">Pending</p>
                   </div>
                 </div>

@@ -162,6 +162,16 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.connection-avatar-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pink);
+  flex-shrink: 0;
 }
 
 .connection-info {
@@ -245,6 +255,16 @@
   justify-content: center;
   font-weight: 700;
   font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.chat-avatar-image {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pink);
+  flex-shrink: 0;
 }
 
 .chat-user-name {

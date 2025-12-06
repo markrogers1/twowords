@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import {
   requestNotificationPermission,
   subscribeToPushNotifications,
@@ -11,13 +12,15 @@ import '../styles/profile.css';
 
 export function Profile() {
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const [notificationStatus, setNotificationStatus] = useState<{
     supported: boolean;
     permission: NotificationPermission;
     subscribed: boolean;
   }>({ supported: false, permission: 'default', subscribed: false });
   const [isLoading, setIsLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     checkStatus();
@@ -57,6 +60,62 @@ export function Profile() {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}/avatar.${fileExt}`;
+
+      if (profile.profile_image_url) {
+        const oldPath = profile.profile_image_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([`${profile.id}/${oldPath}`]);
+        }
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ profile_image_url: publicUrl })
+        .eq('id', profile.id);
+
+      if (updateError) throw updateError;
+
+      setImagePreview(publicUrl);
+      if (refreshProfile) {
+        await refreshProfile();
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (!profile) {
     return <div className="loading">Loading...</div>;
   }
@@ -67,8 +126,29 @@ export function Profile() {
         <button className="back-btn" onClick={() => navigate('/chat')}>← Back to Chat</button>
 
         <div className="profile-header">
-          <div className="profile-avatar-large">
-            {profile.first_name[0]}{profile.last_name[0]}
+          <div className="profile-avatar-container">
+            {(imagePreview || profile.profile_image_url) ? (
+              <img
+                src={imagePreview || profile.profile_image_url}
+                alt="Profile"
+                className="profile-avatar-image"
+              />
+            ) : (
+              <div className="profile-avatar-large">
+                {profile.first_name[0]}{profile.last_name[0]}
+              </div>
+            )}
+            <label className="avatar-upload-label" htmlFor="avatar-upload">
+              {uploading ? 'Uploading...' : '📷'}
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              disabled={uploading}
+              className="avatar-upload-input"
+            />
           </div>
           <h1>{profile.first_name} {profile.last_name}</h1>
         </div>
