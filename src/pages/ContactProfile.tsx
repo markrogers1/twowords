@@ -14,6 +14,7 @@ interface SocialLink {
 interface Connection {
   id: string;
   connection_type: 'friend' | 'business';
+  tier: 'random' | 'acquaintance' | 'friend' | 'close_friend';
 }
 
 const PLATFORMS: Record<string, { name: string; color: string; textColor: string; icon: string }> = {
@@ -37,6 +38,8 @@ export function ContactProfile() {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [connection, setConnection] = useState<Connection | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingTier, setEditingTier] = useState(false);
+  const [newTier, setNewTier] = useState<'random' | 'acquaintance' | 'friend' | 'close_friend'>('friend');
 
   useEffect(() => {
     if (!user || !userId) {
@@ -64,7 +67,7 @@ export function ContactProfile() {
 
     const { data: connectionData } = await supabase
       .from('connections')
-      .select('id, connection_type')
+      .select('id, connection_type, tier')
       .or(`and(user_one_id.eq.${user.id},user_two_id.eq.${userId}),and(user_one_id.eq.${userId},user_two_id.eq.${user.id})`)
       .eq('status', 'accepted')
       .maybeSingle();
@@ -95,6 +98,23 @@ export function ContactProfile() {
     }
 
     setLoading(false);
+  };
+
+  const handleUpdateTier = async () => {
+    if (!connection) return;
+
+    const { error } = await supabase
+      .from('connections')
+      .update({ tier: newTier })
+      .eq('id', connection.id);
+
+    if (error) {
+      console.error('Error updating tier:', error);
+      return;
+    }
+
+    setConnection({ ...connection, tier: newTier });
+    setEditingTier(false);
   };
 
   if (loading) {
@@ -139,9 +159,76 @@ export function ContactProfile() {
           <div className="profile-meta">
             <p>{profile.country}</p>
             {connection && (
-              <span className="connection-type-badge">
-                {connection.connection_type === 'business' ? 'Business Contact' : 'Friend'}
-              </span>
+              <>
+                <span className="connection-type-badge">
+                  {connection.connection_type === 'business' ? 'Business Contact' : 'Friend'}
+                </span>
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#F9FAFB', borderRadius: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Relationship Level:</label>
+                    <button
+                      onClick={() => {
+                        setNewTier(connection.tier);
+                        setEditingTier(!editingTier);
+                      }}
+                      style={{
+                        fontSize: '0.75rem',
+                        padding: '0.25rem 0.5rem',
+                        background: 'white',
+                        border: '1px solid #D1D5DB',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {editingTier ? 'Cancel' : 'Change'}
+                    </button>
+                  </div>
+                  {!editingTier ? (
+                    <div style={{ fontSize: '0.875rem', color: '#6B7280' }}>
+                      {connection.tier === 'random' && '🎲 Just Met / Random'}
+                      {connection.tier === 'acquaintance' && '👋 Acquaintance'}
+                      {connection.tier === 'friend' && '👤 Friend'}
+                      {connection.tier === 'close_friend' && '⭐ Close Friend'}
+                    </div>
+                  ) : (
+                    <div>
+                      <select
+                        value={newTier}
+                        onChange={(e) => setNewTier(e.target.value as any)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          border: '1px solid #D1D5DB',
+                          borderRadius: '0.25rem',
+                          fontSize: '0.875rem',
+                          marginBottom: '0.5rem'
+                        }}
+                      >
+                        <option value="random">Just Met / Random</option>
+                        <option value="acquaintance">Acquaintance</option>
+                        <option value="friend">Friend</option>
+                        <option value="close_friend">Close Friend</option>
+                      </select>
+                      <button
+                        onClick={handleUpdateTier}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          background: '#10B981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.25rem',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

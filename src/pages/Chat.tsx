@@ -275,6 +275,16 @@ export function Chat() {
                   <div className="connection-username">
                     {conn.otherUser.word_one} | {conn.otherUser.word_two}
                   </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: '#9CA3AF',
+                    marginTop: '0.125rem'
+                  }}>
+                    {conn.tier === 'random' && '🎲 Just Met'}
+                    {conn.tier === 'acquaintance' && '👋 Acquaintance'}
+                    {conn.tier === 'friend' && '👤 Friend'}
+                    {conn.tier === 'close_friend' && '⭐ Close Friend'}
+                  </div>
                 </div>
               </button>
             ))

@@ -12,7 +12,10 @@ export function Connections() {
   const [requests, setRequests] = useState<(Connection & { otherProfile: Profile })[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [connectionTier, setConnectionTier] = useState<'random' | 'acquaintance' | 'friend' | 'close_friend'>('friend');
   const [connectionType, setConnectionType] = useState<'friend' | 'business'>('friend');
+  const [acceptingRequestId, setAcceptingRequestId] = useState<string | null>(null);
+  const [acceptTier, setAcceptTier] = useState<'random' | 'acquaintance' | 'friend' | 'close_friend'>('friend');
 
   useEffect(() => {
     if (!user) {
@@ -98,7 +101,7 @@ export function Connections() {
     setLoading(false);
   };
 
-  const sendConnectionRequest = async (toUserId: string, type: 'friend' | 'business') => {
+  const sendConnectionRequest = async (toUserId: string, type: 'friend' | 'business', tier: 'random' | 'acquaintance' | 'friend' | 'close_friend') => {
     if (!user) return;
 
     const { data: existingConnection } = await supabase
@@ -124,6 +127,7 @@ export function Connections() {
       status: 'pending',
       requester_id: user.id,
       connection_type: type,
+      tier: tier,
     });
 
     if (error) {
@@ -134,16 +138,17 @@ export function Connections() {
     setSearchResult(null);
     setSearchWords({ word1: '', word2: '', country: 'US' });
     setConnectionType('friend');
+    setConnectionTier('friend');
     alert('Connection request sent!');
     loadRequests();
   };
 
-  const handleAcceptRequest = async (connectionId: string) => {
+  const handleAcceptRequest = async (connectionId: string, tier: 'random' | 'acquaintance' | 'friend' | 'close_friend') => {
     if (!user) return;
 
     const { error } = await supabase
       .from('connections')
-      .update({ status: 'accepted' })
+      .update({ status: 'accepted', tier: tier })
       .eq('id', connectionId);
 
     if (error) {
@@ -151,6 +156,8 @@ export function Connections() {
       return;
     }
 
+    setAcceptingRequestId(null);
+    setAcceptTier('friend');
     loadRequests();
   };
 
@@ -256,10 +263,29 @@ export function Connections() {
                       <span>Business</span>
                     </label>
                   </div>
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem', display: 'block' }}>Relationship Level:</label>
+                    <select
+                      value={connectionTier}
+                      onChange={(e) => setConnectionTier(e.target.value as any)}
+                      style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #D1D5DB',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem'
+                      }}
+                    >
+                      <option value="random">Just Met / Random</option>
+                      <option value="acquaintance">Acquaintance</option>
+                      <option value="friend">Friend</option>
+                      <option value="close_friend">Close Friend</option>
+                    </select>
+                  </div>
                 </div>
                 <button
                   className="connect-btn"
-                  onClick={() => sendConnectionRequest(searchResult.id, connectionType)}
+                  onClick={() => sendConnectionRequest(searchResult.id, connectionType, connectionTier)}
                 >
                   Send Request
                 </button>
@@ -295,7 +321,10 @@ export function Connections() {
                   <div className="request-actions">
                     <button
                       className="accept-btn"
-                      onClick={() => handleAcceptRequest(req.id)}
+                      onClick={() => {
+                        setAcceptingRequestId(req.id);
+                        setAcceptTier('friend');
+                      }}
                     >
                       Accept
                     </button>
@@ -338,6 +367,67 @@ export function Connections() {
           )}
         </div>
       </div>
+
+      {acceptingRequestId && (
+        <div className="modal-overlay" onClick={() => setAcceptingRequestId(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+            <h2>Accept Connection</h2>
+            <p style={{ marginBottom: '1rem', color: '#6B7280' }}>Choose how you'd like to categorize this connection:</p>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '0.5rem', display: 'block' }}>Relationship Level:</label>
+              <select
+                value={acceptTier}
+                onChange={(e) => setAcceptTier(e.target.value as any)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '2px solid #D1D5DB',
+                  borderRadius: '0.5rem',
+                  fontSize: '1rem'
+                }}
+              >
+                <option value="random">Just Met / Random</option>
+                <option value="acquaintance">Acquaintance</option>
+                <option value="friend">Friend</option>
+                <option value="close_friend">Close Friend</option>
+              </select>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#6B7280' }}>
+                This helps control what information you share with them.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => setAcceptingRequestId(null)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '0.5rem',
+                  background: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleAcceptRequest(acceptingRequestId, acceptTier)}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  background: '#10B981',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

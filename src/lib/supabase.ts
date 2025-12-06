@@ -40,6 +40,7 @@ export interface Connection {
   status: 'pending' | 'accepted' | 'rejected';
   requester_id: string;
   connection_type: 'friend' | 'business';
+  tier: 'random' | 'acquaintance' | 'friend' | 'close_friend';
   created_at: string;
   updated_at: string;
 }
