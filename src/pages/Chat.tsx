@@ -16,6 +16,7 @@ export function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showImagePermissionModal, setShowImagePermissionModal] = useState(false);
@@ -65,30 +66,36 @@ export function Chat() {
       loadMessages(selectedConnection);
       lastMessageCountRef.current = 0;
 
+      const connection = connections.find(c => c.id === selectedConnection);
+      if (!connection) return;
+
       const subscription = supabase
-        .channel('messages')
+        .channel(`messages-${selectedConnection}`)
         .on('postgres_changes', {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `to_user_id=eq.${user?.id}`,
-        }, () => {
-          loadMessages(selectedConnection);
+        }, (payload) => {
+          const newMsg = payload.new as Message;
+          const isRelevant =
+            (newMsg.from_user_id === user?.id && newMsg.to_user_id === connection.otherUser.id) ||
+            (newMsg.from_user_id === connection.otherUser.id && newMsg.to_user_id === user?.id);
 
-          if (lastMessageCountRef.current > 0) {
-            playNotificationSound();
+          if (isRelevant) {
+            setMessages(prev => [...prev, newMsg]);
 
-            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
-              const connection = connections.find(c => c.id === selectedConnection);
-              if (connection) {
+            if (newMsg.from_user_id !== user?.id && lastMessageCountRef.current > 0) {
+              playNotificationSound();
+
+              if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
                 new Notification('New message', {
                   body: `${connection.otherUser.first_name} sent you a message`,
                   icon: '/icon-192.png',
                 });
               }
             }
+            lastMessageCountRef.current++;
           }
-          lastMessageCountRef.current++;
         })
         .subscribe();
 
@@ -209,13 +216,17 @@ export function Chat() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConnection || !user || !profile) return;
+    if (!newMessage.trim() || !selectedConnection || !user || !profile || sending) return;
 
     const connection = connections.find(c => c.id === selectedConnection);
     if (!connection) return;
 
+    const messageText = newMessage;
+    setNewMessage('');
+    setSending(true);
+
     const encryptionKey = generateEncryptionKey(user.id, connection.otherUser.id);
-    const encryptedContent = encryptMessage(newMessage, encryptionKey);
+    const encryptedContent = encryptMessage(messageText, encryptionKey);
 
     const { error } = await supabase.from('messages').insert({
       from_user_id: user.id,
@@ -225,10 +236,14 @@ export function Chat() {
 
     if (error) {
       console.error('Error sending message:', error);
+      setNewMessage(messageText);
+      setSending(false);
       return;
     }
 
-    const messagePreview = newMessage.length > 50 ? newMessage.substring(0, 50) + '...' : newMessage;
+    setSending(false);
+
+    const messagePreview = messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText;
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -250,9 +265,6 @@ export function Chat() {
     } catch (error) {
       console.error('Error sending push notification:', error);
     }
-
-    setNewMessage('');
-    loadMessages(selectedConnection);
   };
 
   const handleSignOut = async () => {
@@ -468,8 +480,11 @@ export function Chat() {
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
                 className="message-input"
+                disabled={sending}
               />
-              <button type="submit" className="send-btn">Send</button>
+              <button type="submit" className="send-btn" disabled={sending}>
+                {sending ? 'Sending...' : 'Send'}
+              </button>
             </form>
           </>
         ) : (
