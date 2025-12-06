@@ -1,0 +1,347 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@900;600;500&display=swap');
+
+:root {
+  --pink: #E91E63;
+  --black: #1A1A1A;
+  --gray: #555555;
+  --white: #FFFFFF;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+.home-container {
+  background: var(--pink);
+  font-family: 'Inter', sans-serif;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.top-bar {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  right: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.info-btn {
+  background: white;
+  color: var(--pink);
+  font-weight: 700;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.login-btn {
+  background: white;
+  color: var(--pink);
+  font-weight: 700;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.login-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.logo-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  margin-bottom: 0.3rem;
+  transition: transform 0.15s ease;
+}
+
+.logo-btn:hover {
+  transform: scale(1.04);
+}
+
+.logo-btn:active {
+  transform: scale(0.97);
+}
+
+@keyframes doubleBump {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.06); }
+  40% { transform: scale(1.02); }
+  60% { transform: scale(1.08); }
+  80%, 100% { transform: scale(1); }
+}
+
+.logo-btn.bumping {
+  animation: doubleBump 0.8s ease-in-out;
+}
+
+.logo-text {
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: white;
+}
+
+.logo-bar {
+  font-size: clamp(3.8rem, 13.5vw, 6.8rem);
+  font-weight: 900;
+  color: var(--black);
+  line-height: 0.9;
+  margin-top: -0.05em;
+}
+
+.subtitle {
+  font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.search-bar {
+  background: white;
+  padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.8rem, 2.5vw, 1.2rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.18);
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  border-radius: 1.8rem;
+  height: clamp(48px, 10vw, 56px);
+  overflow: hidden;
+}
+
+.bubble {
+  font-size: clamp(1.1rem, 3.2vw, 1.45rem);
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background: transparent;
+  color: var(--gray);
+  text-align: center;
+  flex: 1;
+  font-weight: 600;
+  min-width: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.search-bar .separator {
+  font-size: clamp(2.6rem, 9.5vw, 4.7rem);
+  font-weight: 900;
+  color: var(--pink);
+  margin: 0 0.6rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.mic-btn {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  color: white;
+  width: clamp(64px, 14vw, 80px);
+  height: clamp(64px, 14vw, 80px);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin: 1rem auto 3rem;
+  padding: 0;
+}
+
+.mic-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.05);
+}
+
+.mic-icon {
+  width: 40%;
+  height: 40%;
+  fill: currentColor;
+}
+
+.examples {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  margin-bottom: 3rem;
+  line-height: 1.6;
+  color: white;
+  opacity: 0.9;
+}
+
+.examples strong {
+  font-weight: 700;
+  color: white;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  color: var(--black);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  max-width: 340px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+  position: absolute;
+  top: 0.8rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.modal h3 {
+  margin-bottom: 1rem;
+  color: var(--pink);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.modal p {
+  font-size: 1rem;
+  margin: 0.9rem 0;
+  color: #444;
+  line-height: 1.5;
+}
+
+.modal strong {
+  color: var(--black);
+}
+
+.modal .highlight {
+  background: var(--pink);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.modal ul {
+  text-align: left;
+  margin: 1rem 0;
+  padding-left: 1.2rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.modal li {
+  margin: 0.5rem 0;
+}
+
+.cta-btn {
+  background: var(--pink);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.cta-btn:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+  }
+  .info-btn, .login-btn {
+    font-size: 0.9rem;
+  }
+  .info-btn {
+    width: 2rem;
+    height: 2rem;
+  }
+  .login-btn {
+    padding: 0.5rem 0.9rem;
+  }
+  .search-bar {
+    flex-direction: row !important;
+    padding: 0.5rem 0.8rem;
+    height: 46px;
+    border-radius: 1.6rem;
+  }
+  .bubble {
+    font-size: 1.05rem;
+    min-width: 70px;
+  }
+  .search-bar .separator {
+    font-size: 2.2rem;
+    margin: 0 0.4rem;
+  }
+  .logo-bar {
+    font-size: 3.6rem;
+  }
+}
