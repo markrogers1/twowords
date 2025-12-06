@@ -19,6 +19,14 @@
   position: relative;
 }
 
+[data-theme="dark"] .auth-card {
+  background: #2A2A2A;
+}
+
+[data-theme="dark"] .auth-container {
+  background: #121212;
+}
+
 .back-btn {
   background: none;
   border: none;
@@ -80,6 +88,12 @@
   font-size: 0.9rem;
 }
 
+[data-theme="dark"] .error-message {
+  background: #4A1A1A;
+  border-color: #6A2A2A;
+  color: #FF6B6B;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -112,6 +126,15 @@
   font-size: 1rem;
   font-family: 'Inter', sans-serif;
   transition: border-color 0.2s;
+  background: white;
+  color: var(--black);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
+  background: #1A1A1A;
+  border-color: #3A3A3A;
+  color: white;
 }
 
 .form-group input:focus,

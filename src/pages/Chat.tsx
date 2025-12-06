@@ -5,6 +5,7 @@ import { supabase, Profile, Message, Connection } from '../lib/supabase';
 import { encryptMessage, decryptMessage, generateEncryptionKey } from '../lib/encryption';
 import { playNotificationSound } from '../lib/notifications';
 import { Onboarding } from '../components/Onboarding';
+import { DarkModeToggle } from '../components/DarkModeToggle';
 import QRCode from 'qrcode';
 import '../styles/chat.css';
 
@@ -358,6 +359,9 @@ export function Chat() {
             <button className="action-btn" onClick={() => navigate('/profile')}>Profile</button>
             <button className="action-btn" onClick={() => navigate('/connections')}>Add</button>
             <button className="action-btn logout-btn" onClick={handleSignOut}>Exit</button>
+          </div>
+          <div style={{ padding: '0 1.5rem', marginTop: '0.75rem' }}>
+            <DarkModeToggle />
           </div>
         </div>
 

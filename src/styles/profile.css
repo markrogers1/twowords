@@ -290,3 +290,31 @@
     font-size: 2rem;
   }
 }
+
+[data-theme="dark"] .profile-container {
+  background: #1A1A1A;
+}
+
+[data-theme="dark"] .profile-header {
+  background: #2A2A2A;
+  border-bottom-color: #3A3A3A;
+}
+
+[data-theme="dark"] .profile-card {
+  background: #2A2A2A;
+}
+
+[data-theme="dark"] .profile-form input {
+  background: #1A1A1A;
+  border-color: #3A3A3A;
+  color: white;
+}
+
+[data-theme="dark"] .upload-btn {
+  background: #3A3A3A;
+  color: #B0B0B0;
+}
+
+[data-theme="dark"] .upload-btn:hover {
+  background: #4A4A4A;
+}

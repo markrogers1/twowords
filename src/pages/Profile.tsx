@@ -8,6 +8,7 @@ import {
   unsubscribeFromPushNotifications,
   checkNotificationStatus
 } from '../lib/notifications';
+import { DarkModeToggle } from '../components/DarkModeToggle';
 import '../styles/profile.css';
 
 export function Profile() {
@@ -122,6 +123,9 @@ export function Profile() {
 
   return (
     <div className="profile-container">
+      <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
+        <DarkModeToggle />
+      </div>
       <div className="profile-card">
         <button className="back-btn" onClick={() => navigate('/chat')}>← Back to Chat</button>
 

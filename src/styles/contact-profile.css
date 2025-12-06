@@ -191,3 +191,24 @@
     font-size: 0.85rem;
   }
 }
+
+[data-theme="dark"] .contact-profile-container {
+  background: #1A1A1A;
+}
+
+[data-theme="dark"] .contact-profile-header {
+  background: #2A2A2A;
+  border-bottom-color: #3A3A3A;
+}
+
+[data-theme="dark"] .profile-card {
+  background: #2A2A2A;
+}
+
+[data-theme="dark"] .social-links-section {
+  background: #2A2A2A;
+}
+
+[data-theme="dark"] .no-links-card {
+  background: #2A2A2A;
+}
