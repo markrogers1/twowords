@@ -512,7 +512,9 @@ export function Chat() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000
+            zIndex: 1000,
+            overflowY: 'auto',
+            padding: '1rem'
           }}
           onClick={() => setShowImagePermissionModal(false)}
         >
@@ -523,7 +525,10 @@ export function Chat() {
               padding: '2rem',
               maxWidth: '400px',
               width: '90%',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+              maxHeight: 'calc(100vh - 2rem)',
+              overflowY: 'auto',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              margin: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -589,7 +594,9 @@ export function Chat() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000
+            zIndex: 1000,
+            overflowY: 'auto',
+            padding: '1rem'
           }}
           onClick={() => setShowQRModal(false)}
         >
@@ -600,8 +607,11 @@ export function Chat() {
               padding: '2.5rem',
               maxWidth: '450px',
               width: '90%',
+              maxHeight: 'calc(100vh - 2rem)',
+              overflowY: 'auto',
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
-              textAlign: 'center'
+              textAlign: 'center',
+              margin: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
           >

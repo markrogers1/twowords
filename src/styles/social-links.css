@@ -190,6 +190,7 @@
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  overflow-y: auto;
 }
 
 .modal-content {
@@ -198,7 +199,10 @@
   padding: 2rem;
   max-width: 500px;
   width: 100%;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  margin: auto;
 }
 
 .modal-content h2 {
@@ -310,8 +314,14 @@
     padding: 0.9rem;
   }
 
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
   .modal-content {
     padding: 1.5rem;
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1rem 1rem 0 0;
   }
 
   .modal-actions {

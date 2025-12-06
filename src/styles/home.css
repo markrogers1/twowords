@@ -229,6 +229,7 @@
   justify-content: center;
   z-index: 100;
   padding: 1rem;
+  overflow-y: auto;
 }
 
 .modal.active {
@@ -241,9 +242,12 @@
   padding: 2rem;
   border-radius: 1.5rem;
   max-width: 340px;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   text-align: center;
   position: relative;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  margin: auto;
 }
 
 .close-modal {
@@ -344,5 +348,12 @@
   }
   .logo-bar {
     font-size: 3.6rem;
+  }
+  .modal {
+    padding: 0.5rem;
+  }
+  .modal-content {
+    padding: 1.5rem;
+    max-height: calc(100dvh - 1rem);
   }
 }
