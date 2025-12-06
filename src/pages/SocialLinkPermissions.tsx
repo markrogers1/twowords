@@ -106,7 +106,7 @@ export function SocialLinkPermissions() {
   };
 
   const handleToggleVisibility = async (connectionId: string, currentlyVisible: boolean) => {
-    if (!linkId) return;
+    if (!linkId || !user) return;
 
     const message = currentlyVisible
       ? 'Are you sure you want to hide this link from this contact?'
@@ -136,6 +136,7 @@ export function SocialLinkPermissions() {
           social_link_id: linkId,
           connection_id: connectionId,
           is_visible: !currentlyVisible,
+          user_id: user.id,
         });
 
       if (error) {
