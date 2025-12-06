@@ -1,10 +1,61 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  requestNotificationPermission,
+  subscribeToPushNotifications,
+  unsubscribeFromPushNotifications,
+  checkNotificationStatus
+} from '../lib/notifications';
 import '../styles/profile.css';
 
 export function Profile() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const [notificationStatus, setNotificationStatus] = useState<{
+    supported: boolean;
+    permission: NotificationPermission;
+    subscribed: boolean;
+  }>({ supported: false, permission: 'default', subscribed: false });
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    checkStatus();
+  }, []);
+
+  const checkStatus = async () => {
+    const status = await checkNotificationStatus();
+    setNotificationStatus(status);
+  };
+
+  const handleEnableNotifications = async () => {
+    setIsLoading(true);
+    try {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        await subscribeToPushNotifications();
+        await checkStatus();
+      }
+    } catch (error) {
+      console.error('Error enabling notifications:', error);
+      alert('Failed to enable notifications. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    setIsLoading(true);
+    try {
+      await unsubscribeFromPushNotifications();
+      await checkStatus();
+    } catch (error) {
+      console.error('Error disabling notifications:', error);
+      alert('Failed to disable notifications. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!profile) {
     return <div className="loading">Loading...</div>;
@@ -50,6 +101,33 @@ export function Profile() {
             </div>
           </div>
         </div>
+
+        {notificationStatus.supported && (
+          <div className="profile-info-box">
+            <h3>Notifications</h3>
+            <div className="notification-settings">
+              <p>
+                {notificationStatus.subscribed
+                  ? 'Notifications are enabled. You will receive alerts for new messages.'
+                  : 'Enable notifications to get alerts when you receive messages, even when the app is closed.'}
+              </p>
+              {notificationStatus.permission === 'denied' && (
+                <p className="notification-warning">
+                  Notifications are blocked. Please enable them in your browser settings.
+                </p>
+              )}
+              {notificationStatus.permission !== 'denied' && (
+                <button
+                  onClick={notificationStatus.subscribed ? handleDisableNotifications : handleEnableNotifications}
+                  disabled={isLoading}
+                  className="notification-btn"
+                >
+                  {isLoading ? 'Processing...' : notificationStatus.subscribed ? 'Disable Notifications' : 'Enable Notifications'}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="profile-info-box">
           <h3>How it works</h3>

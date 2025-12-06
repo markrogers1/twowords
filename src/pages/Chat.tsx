@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, Profile, Message, Connection } from '../lib/supabase';
 import { encryptMessage, decryptMessage, generateEncryptionKey } from '../lib/encryption';
+import { playNotificationSound } from '../lib/notifications';
 import '../styles/chat.css';
 
 export function Chat() {
@@ -15,6 +16,7 @@ export function Chat() {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastMessageCountRef = useRef<number>(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +42,8 @@ export function Chat() {
   useEffect(() => {
     if (selectedConnection) {
       loadMessages(selectedConnection);
+      lastMessageCountRef.current = 0;
+
       const subscription = supabase
         .channel('messages')
         .on('postgres_changes', {
@@ -49,6 +53,21 @@ export function Chat() {
           filter: `to_user_id=eq.${user?.id}`,
         }, () => {
           loadMessages(selectedConnection);
+
+          if (lastMessageCountRef.current > 0) {
+            playNotificationSound();
+
+            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+              const connection = connections.find(c => c.id === selectedConnection);
+              if (connection) {
+                new Notification('New message', {
+                  body: `${connection.otherUser.first_name} sent you a message`,
+                  icon: '/icon-192.png',
+                });
+              }
+            }
+          }
+          lastMessageCountRef.current++;
         })
         .subscribe();
 
@@ -56,7 +75,7 @@ export function Chat() {
         subscription.unsubscribe();
       };
     }
-  }, [selectedConnection, user?.id]);
+  }, [selectedConnection, user?.id, connections]);
 
   useEffect(() => {
     scrollToBottom();
@@ -116,7 +135,7 @@ export function Chat() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConnection || !user) return;
+    if (!newMessage.trim() || !selectedConnection || !user || !profile) return;
 
     const connection = connections.find(c => c.id === selectedConnection);
     if (!connection) return;
@@ -133,6 +152,29 @@ export function Chat() {
     if (error) {
       console.error('Error sending message:', error);
       return;
+    }
+
+    const messagePreview = newMessage.length > 50 ? newMessage.substring(0, 50) + '...' : newMessage;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-notification`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            recipientId: connection.otherUser.id,
+            title: `${profile.first_name} ${profile.last_name}`,
+            body: messagePreview,
+            url: '/chat',
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Error sending push notification:', error);
     }
 
     setNewMessage('');
