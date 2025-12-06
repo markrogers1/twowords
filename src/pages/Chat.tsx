@@ -13,11 +13,21 @@ export function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -134,6 +144,10 @@ export function Chat() {
     navigate('/');
   };
 
+  const handleBackToList = () => {
+    setSelectedConnection(null);
+  };
+
   const selectedUser = connections.find(c => c.id === selectedConnection)?.otherUser;
 
   if (loading) {
@@ -142,7 +156,7 @@ export function Chat() {
 
   return (
     <div className="chat-container">
-      <div className="chat-sidebar">
+      <div className={`chat-sidebar ${isMobile && selectedConnection ? 'hidden' : ''}`}>
         <div className="sidebar-header">
           <div className="profile-section">
             <h2 className="sidebar-title">TWO | WORDS</h2>
@@ -197,6 +211,7 @@ export function Chat() {
         {selectedConnection && selectedUser ? (
           <>
             <div className="chat-header">
+              <button className="back-to-list-btn" onClick={handleBackToList}>←</button>
               <div className="chat-user-info">
                 <div className="chat-avatar">
                   {selectedUser.first_name[0]}{selectedUser.last_name[0]}

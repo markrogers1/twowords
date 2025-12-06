@@ -1,5 +1,6 @@
 .profile-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background: #f9f9f9;
   display: flex;
   align-items: center;

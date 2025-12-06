@@ -1,5 +1,6 @@
 .connections-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background: #f9f9f9;
   font-family: 'Inter', sans-serif;
 }
@@ -277,21 +278,49 @@
     padding: 1rem;
   }
 
+  .search-section, .requests-group {
+    padding: 1.5rem;
+  }
+
   .search-inputs {
     flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .word-input, .country-select {
+    font-size: 16px;
+    padding: 0.9rem;
+  }
+
+  .search-btn {
+    padding: 1rem 2rem;
+    font-size: 1.05rem;
   }
 
   .result-card, .request-card {
     flex-direction: column;
     text-align: center;
+    gap: 1rem;
+  }
+
+  .result-avatar, .request-avatar {
+    margin: 0 auto;
   }
 
   .request-actions {
     width: 100%;
     flex-direction: column;
+    gap: 0.5rem;
   }
 
-  .accept-btn, .reject-btn {
+  .accept-btn, .reject-btn, .connect-btn {
     width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+  }
+
+  .back-btn {
+    font-size: 1rem;
+    padding: 0.7rem 0;
   }
 }

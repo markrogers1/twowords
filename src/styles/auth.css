@@ -1,5 +1,6 @@
 .auth-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--pink);
   display: flex;
   align-items: center;
@@ -169,5 +170,20 @@
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 16px;
+    padding: 0.85rem;
+  }
+
+  .submit-btn {
+    padding: 1rem;
+    font-size: 1.05rem;
+  }
+
+  .back-btn {
+    font-size: 1rem;
   }
 }
