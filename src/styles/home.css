@@ -5,54 +5,9 @@
   --black: #1A1A1A;
   --gray: #555555;
   --white: #FFFFFF;
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F9FAFB;
-  --text-primary: #1A1A1A;
-  --text-secondary: #555555;
-  --border-color: #E0E0E0;
-  --shadow: rgba(0,0,0,0.1);
-}
-
-[data-theme="dark"] {
-  --pink: #FF4081;
-  --black: #FFFFFF;
-  --gray: #B0B0B0;
-  --white: #1A1A1A;
-  --bg-primary: #1A1A1A;
-  --bg-secondary: #2A2A2A;
-  --text-primary: #FFFFFF;
-  --text-secondary: #B0B0B0;
-  --border-color: #3A3A3A;
-  --shadow: rgba(0,0,0,0.3);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-
-.dark-mode-toggle {
-  background: white;
-  color: var(--pink);
-  font-size: 1.2rem;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 12px var(--shadow);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-[data-theme="dark"] .dark-mode-toggle {
-  background: #2A2A2A;
-  color: #FFD700;
-}
-
-.dark-mode-toggle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px var(--shadow);
-}
 
 .home-container {
   background: var(--pink);
@@ -193,16 +148,6 @@
   overflow: hidden;
 }
 
-[data-theme="dark"] .search-bar {
-  background: #2A2A2A;
-}
-
-[data-theme="dark"] .info-btn,
-[data-theme="dark"] .login-btn {
-  background: #2A2A2A;
-  color: var(--pink);
-}
-
 .bubble {
   font-size: clamp(1.1rem, 3.2vw, 1.45rem);
   padding: 0.4rem 0.8rem;
@@ -292,8 +237,8 @@
 }
 
 .modal-content {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: white;
+  color: var(--black);
   padding: 2rem;
   border-radius: 1.5rem;
   max-width: 340px;
@@ -301,7 +246,7 @@
   overflow-y: auto;
   text-align: center;
   position: relative;
-  box-shadow: 0 20px 40px var(--shadow);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   margin: auto;
 }
 
@@ -313,7 +258,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: #999;
 }
 
 .modal h3 {
@@ -326,12 +271,12 @@
 .modal p {
   font-size: 1rem;
   margin: 0.9rem 0;
-  color: var(--text-secondary);
+  color: #444;
   line-height: 1.5;
 }
 
 .modal strong {
-  color: var(--text-primary);
+  color: var(--black);
 }
 
 .modal .highlight {

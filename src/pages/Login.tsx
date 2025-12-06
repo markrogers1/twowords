@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 import '../styles/auth.css';
 
 export function Login() {
@@ -36,9 +35,6 @@ export function Login() {
 
   return (
     <div className="auth-container">
-      <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
-        <DarkModeToggle />
-      </div>
       <div className="auth-card">
         <button className="back-btn" onClick={() => navigate('/')}>← Back</button>
 

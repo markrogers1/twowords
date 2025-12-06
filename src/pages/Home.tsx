@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 import '../styles/home.css';
 
 const WORDS = [
@@ -79,10 +78,7 @@ export function Home() {
     <div className="home-container">
       <div className="top-bar">
         <button className="info-btn" onClick={() => setShowInfoModal(true)}>i</button>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <DarkModeToggle />
-          <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
-        </div>
+        <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
       </div>
 
       <button className={`logo-btn ${isBumping ? 'bumping' : ''}`} onClick={() => setShowShareModal(true)}>

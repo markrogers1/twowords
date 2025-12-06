@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 import { supabase, Profile, Connection } from '../lib/supabase';
 import '../styles/connections.css';
 
@@ -233,9 +232,6 @@ export function Connections() {
 
   return (
     <div className="connections-container">
-      <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
-        <DarkModeToggle />
-      </div>
       <div className="connections-header">
         <button className="back-btn" onClick={() => navigate('/chat')}>← Back to Chat</button>
         <h1>Find Connections</h1>

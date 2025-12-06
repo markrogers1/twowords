@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 import { supabase } from '../lib/supabase';
 import '../styles/social-links.css';
 
@@ -127,9 +126,6 @@ export function SocialLinks() {
 
   return (
     <div className="social-links-container">
-      <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
-        <DarkModeToggle />
-      </div>
       <div className="social-links-header">
         <button className="back-btn" onClick={() => navigate('/profile')}>← Back to Profile</button>
         <h1>Social Links</h1>

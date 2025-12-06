@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 import { supabase, Profile } from '../lib/supabase';
 import '../styles/social-link-permissions.css';
 
@@ -159,9 +158,6 @@ export function SocialLinkPermissions() {
 
   return (
     <div className="permissions-container">
-      <div style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
-        <DarkModeToggle />
-      </div>
       <div className="permissions-header">
         <button className="back-btn" onClick={() => navigate('/social-links')}>← Back to Social Links</button>
         <h1>Manage Visibility</h1>
