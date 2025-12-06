@@ -104,8 +104,8 @@ export function Chat() {
 
   useEffect(() => {
     if (showQRModal && profile) {
-      const username = `${profile.word_one} | ${profile.word_two}`;
-      QRCode.toDataURL(username, {
+      const addUrl = `https://twowords-one.vercel.app/?add=${encodeURIComponent(profile.word_one)}|${encodeURIComponent(profile.word_two)}`;
+      QRCode.toDataURL(addUrl, {
         width: 300,
         margin: 2,
         color: {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/home.css';
 
@@ -13,6 +13,7 @@ const WORDS = [
 export function Home() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const [searchParams] = useSearchParams();
   const [word1, setWord1] = useState("ninja");
   const [word2, setWord2] = useState("waffle");
   const [isSpinning, setIsSpinning] = useState(false);
@@ -60,10 +61,18 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    if (profile) {
+    const addParam = searchParams.get('add');
+    if (addParam) {
+      localStorage.setItem('pendingConnection', addParam);
+      if (profile) {
+        navigate('/connections');
+      } else {
+        navigate('/signup');
+      }
+    } else if (profile) {
       navigate('/chat');
     }
-  }, [profile, navigate]);
+  }, [profile, navigate, searchParams]);
 
   return (
     <div className="home-container">

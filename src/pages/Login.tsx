@@ -20,7 +20,12 @@ export function Login() {
 
     try {
       await signIn(formData.email, formData.password);
-      navigate('/chat');
+      const pendingConnection = localStorage.getItem('pendingConnection');
+      if (pendingConnection) {
+        navigate('/connections');
+      } else {
+        navigate('/chat');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to login');
     } finally {

@@ -23,6 +23,23 @@ export function Connections() {
       return;
     }
     loadRequests();
+
+    const pendingConnection = localStorage.getItem('pendingConnection');
+    if (pendingConnection) {
+      const words = pendingConnection.split('|');
+      if (words.length === 2) {
+        const word1 = decodeURIComponent(words[0].trim());
+        const word2 = decodeURIComponent(words[1].trim());
+        setSearchWords({ word1, word2, country: 'US' });
+        localStorage.removeItem('pendingConnection');
+
+        setTimeout(() => {
+          handleAutoSearch(word1, word2, 'US');
+        }, 500);
+      } else {
+        localStorage.removeItem('pendingConnection');
+      }
+    }
   }, [user, navigate]);
 
   const loadRequests = async () => {
@@ -57,6 +74,41 @@ export function Connections() {
     );
 
     setRequests(requestsWithProfiles);
+  };
+
+  const handleAutoSearch = async (word1: string, word2: string, country: string) => {
+    setError('');
+    setSearchResult(null);
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('word_one', word1.toLowerCase().trim())
+      .eq('word_two', word2.toLowerCase().trim())
+      .eq('country', country)
+      .maybeSingle();
+
+    if (error) {
+      setError('Error searching for user');
+      setLoading(false);
+      return;
+    }
+
+    if (!data) {
+      setError('No user found with those words in that country');
+      setLoading(false);
+      return;
+    }
+
+    if (data.id === user?.id) {
+      setError('This is you!');
+      setLoading(false);
+      return;
+    }
+
+    setSearchResult(data);
+    setLoading(false);
   };
 
   const handleSearch = async (e: React.FormEvent) => {

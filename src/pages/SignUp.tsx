@@ -67,7 +67,12 @@ export function SignUp() {
         formData.lastName,
         formData.country
       );
-      navigate('/chat');
+      const pendingConnection = localStorage.getItem('pendingConnection');
+      if (pendingConnection) {
+        navigate('/connections');
+      } else {
+        navigate('/chat');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
