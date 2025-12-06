@@ -2,12 +2,9 @@ import { supabase } from './supabase';
 
 const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SYj2rN7nQ1WVXhFhGQxGvCnqf5wSv9bVSqC4Q0J9EBHZYnTk0tP7EXE';
 
-function isIOSSafari() {
+function isIOS() {
   const ua = navigator.userAgent;
-  const iOS = /iPad|iPhone|iPod/.test(ua);
-  const webkit = /WebKit/.test(ua);
-  const notChrome = !/CriOS|Chrome/.test(ua);
-  return iOS && webkit && notChrome;
+  return /iPad|iPhone|iPod/.test(ua);
 }
 
 function isSafari() {
@@ -20,8 +17,8 @@ export async function requestNotificationPermission() {
     throw new Error('This browser does not support notifications');
   }
 
-  if (isIOSSafari()) {
-    throw new Error('iOS Safari does not support push notifications. Please use a different browser or device.');
+  if (isIOS()) {
+    throw new Error('iOS devices do not support push notifications in any browser. Please use an Android device or desktop computer.');
   }
 
   const permission = await Notification.requestPermission();
@@ -33,8 +30,8 @@ export async function subscribeToPushNotifications() {
     throw new Error('Push notifications are not supported');
   }
 
-  if (isIOSSafari()) {
-    throw new Error('iOS Safari does not support push notifications. Please use a different browser or device.');
+  if (isIOS()) {
+    throw new Error('iOS devices do not support push notifications in any browser. Please use an Android device or desktop computer.');
   }
 
   try {
@@ -97,7 +94,7 @@ export async function unsubscribeFromPushNotifications() {
 }
 
 export async function checkNotificationStatus() {
-  if (isIOSSafari()) {
+  if (isIOS()) {
     return { supported: false, permission: 'denied' as NotificationPermission, subscribed: false };
   }
 

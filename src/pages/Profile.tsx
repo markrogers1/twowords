@@ -191,7 +191,7 @@ export function Profile() {
                   Push notifications are not available on this device.
                 </p>
                 <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                  iOS Safari does not support push notifications. Please use Chrome, Firefox, or Safari on macOS 13+ to receive message notifications.
+                  iOS devices do not support push notifications in any browser due to Apple restrictions. Please use an Android device or desktop computer to receive message notifications.
                 </p>
               </div>
             ) : (
