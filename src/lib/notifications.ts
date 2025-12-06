@@ -2,9 +2,26 @@ import { supabase } from './supabase';
 
 const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SYj2rN7nQ1WVXhFhGQxGvCnqf5wSv9bVSqC4Q0J9EBHZYnTk0tP7EXE';
 
+function isIOSSafari() {
+  const ua = navigator.userAgent;
+  const iOS = /iPad|iPhone|iPod/.test(ua);
+  const webkit = /WebKit/.test(ua);
+  const notChrome = !/CriOS|Chrome/.test(ua);
+  return iOS && webkit && notChrome;
+}
+
+function isSafari() {
+  const ua = navigator.userAgent;
+  return /^((?!chrome|android).)*safari/i.test(ua);
+}
+
 export async function requestNotificationPermission() {
   if (!('Notification' in window)) {
     throw new Error('This browser does not support notifications');
+  }
+
+  if (isIOSSafari()) {
+    throw new Error('iOS Safari does not support push notifications. Please use a different browser or device.');
   }
 
   const permission = await Notification.requestPermission();
@@ -16,27 +33,49 @@ export async function subscribeToPushNotifications() {
     throw new Error('Push notifications are not supported');
   }
 
-  const registration = await navigator.serviceWorker.register('/sw.js');
-  await registration.update();
+  if (isIOSSafari()) {
+    throw new Error('iOS Safari does not support push notifications. Please use a different browser or device.');
+  }
 
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-  });
+  try {
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/'
+    });
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+    await navigator.serviceWorker.ready;
 
-  const subscriptionData = subscription.toJSON();
+    await registration.update();
 
-  await supabase.from('push_subscriptions').upsert({
-    user_id: user.id,
-    endpoint: subscriptionData.endpoint!,
-    p256dh: subscriptionData.keys!.p256dh,
-    auth: subscriptionData.keys!.auth
-  });
+    const existingSubscription = await registration.pushManager.getSubscription();
+    if (existingSubscription) {
+      await existingSubscription.unsubscribe();
+    }
 
-  return subscription;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const subscriptionData = subscription.toJSON();
+
+    await supabase.from('push_subscriptions').upsert({
+      user_id: user.id,
+      endpoint: subscriptionData.endpoint!,
+      p256dh: subscriptionData.keys!.p256dh,
+      auth: subscriptionData.keys!.auth
+    });
+
+    return subscription;
+  } catch (error) {
+    console.error('Error subscribing to push notifications:', error);
+    if (isSafari()) {
+      throw new Error('Safari requires macOS 13 or later for push notifications. Please check your system version or try a different browser.');
+    }
+    throw error;
+  }
 }
 
 export async function unsubscribeFromPushNotifications() {
@@ -58,19 +97,29 @@ export async function unsubscribeFromPushNotifications() {
 }
 
 export async function checkNotificationStatus() {
+  if (isIOSSafari()) {
+    return { supported: false, permission: 'denied' as NotificationPermission, subscribed: false };
+  }
+
   if (!('Notification' in window)) {
+    return { supported: false, permission: 'denied' as NotificationPermission, subscribed: false };
+  }
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     return { supported: false, permission: 'denied' as NotificationPermission, subscribed: false };
   }
 
   const permission = Notification.permission;
   let subscribed = false;
 
-  if ('serviceWorker' in navigator && 'PushManager' in window) {
+  try {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
       const subscription = await registration.pushManager.getSubscription();
       subscribed = !!subscription;
     }
+  } catch (error) {
+    console.error('Error checking notification status:', error);
   }
 
   return { supported: true, permission, subscribed };

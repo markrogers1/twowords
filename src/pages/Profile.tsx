@@ -182,32 +182,43 @@ export function Profile() {
           </div>
         </div>
 
-        {notificationStatus.supported && (
-          <div className="profile-info-box">
-            <h3>Notifications</h3>
-            <div className="notification-settings">
-              <p>
-                {notificationStatus.subscribed
-                  ? 'Notifications are enabled. You will receive alerts for new messages.'
-                  : 'Enable notifications to get alerts when you receive messages, even when the app is closed.'}
-              </p>
-              {notificationStatus.permission === 'denied' && (
+        <div className="profile-info-box">
+          <h3>Notifications</h3>
+          <div className="notification-settings">
+            {!notificationStatus.supported ? (
+              <div>
                 <p className="notification-warning">
-                  Notifications are blocked. Please enable them in your browser settings.
+                  Push notifications are not available on this device.
                 </p>
-              )}
-              {notificationStatus.permission !== 'denied' && (
-                <button
-                  onClick={notificationStatus.subscribed ? handleDisableNotifications : handleEnableNotifications}
-                  disabled={isLoading}
-                  className="notification-btn"
-                >
-                  {isLoading ? 'Processing...' : notificationStatus.subscribed ? 'Disable Notifications' : 'Enable Notifications'}
-                </button>
-              )}
-            </div>
+                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                  iOS Safari does not support push notifications. Please use Chrome, Firefox, or Safari on macOS 13+ to receive message notifications.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p>
+                  {notificationStatus.subscribed
+                    ? 'Notifications are enabled. You will receive alerts for new messages.'
+                    : 'Enable notifications to get alerts when you receive messages, even when the app is closed.'}
+                </p>
+                {notificationStatus.permission === 'denied' && (
+                  <p className="notification-warning">
+                    Notifications are blocked. Please enable them in your browser settings.
+                  </p>
+                )}
+                {notificationStatus.permission !== 'denied' && (
+                  <button
+                    onClick={notificationStatus.subscribed ? handleDisableNotifications : handleEnableNotifications}
+                    disabled={isLoading}
+                    className="notification-btn"
+                  >
+                    {isLoading ? 'Processing...' : notificationStatus.subscribed ? 'Disable Notifications' : 'Enable Notifications'}
+                  </button>
+                )}
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="profile-info-box">
           <h3>How it works</h3>
